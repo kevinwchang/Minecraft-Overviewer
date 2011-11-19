@@ -1,0 +1,4 @@
+#!/bin/bash
+wget -N http://s3.amazonaws.com/MinecraftDownload/minecraft.jar -P ~/.minecraft/bin/
+rsync -a ../world .
+./overviewer.py --settings settings.py world /var/www/minecraft/map
