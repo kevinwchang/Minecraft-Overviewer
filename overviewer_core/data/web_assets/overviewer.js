@@ -43,7 +43,8 @@ var overviewer = {
          * This is the current infoWindow object, we keep track of it so that
          * there is only one open at a time.
          */
-        'infoWindow':   null
+        'infoWindow':   null,
+        'regionWindows': []
     },
     'util': {
         /**
@@ -357,6 +358,18 @@ var overviewer = {
                                 overviewer.util.createMarkerInfoWindow(marker);
                             }
                         }
+                    }
+
+                    if (item.msg.match(/^\s*#/)) {
+                        var infowindow = new InfoBox();
+                        // Replace our Info Window's content and position
+                        var contentString = item.msg.replace(/(^\s*#+\s*)|(\s*#+\s*$)/g, '');
+                        infowindow.setContent(contentString);
+                        infowindow.setPosition(overviewer.util.fromWorldToLatLng(item.x, item.y, item.z));
+                        infowindow.setOptions({closeBoxURL: "", maxWidth: 0});
+                        infowindow.open(overviewer.map);
+                        overviewer.collections.regionWindows.push(infowindow); 
+                        matched = true;
                     }
 
                     if (!matched) {
@@ -730,7 +743,7 @@ var overviewer = {
                         'label': regionGroup.label, 
                         'checked': regionGroup.checked,
                         'action': function(n, item, checked) {
-                            jQuery.each(overviewer.collections.regions[item.label],
+                            jQuery.each(overviewer.collections.regionWindows,
                                 function(i,elem) {
                                     // Thanks to LeastWeasel for this line!
                                     elem.setMap(checked ? overviewer.map : null);
@@ -1151,3 +1164,4 @@ var overviewer = {
         }
     }
 };
+// vim: expandtab tabstop=4 shiftwidth=4

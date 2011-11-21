@@ -131,7 +131,7 @@ var overviewerConfig = {
             //{label: "Storage", match: function(s) {return s.msg.match(/storage/i) || s.msg.match(/dirt/i) || s.msg.match(/sand/)}},
             //{label: "Below Sealevel", match: function(s) { return s.y<64;}},   
             //{label: "Info", match: function(s) { return s.msg.match("\\[info\\]");}, icon:"http://google-maps-icons.googlecode.com/files/info.png"},   
-            {'label':'All', 'match':function(sign){return true;}}
+            {label: 'All', match: function(s) {return !s.msg.match(/^\s*#/);}}
         ],
         /* regions -- A list of region groups.  A region can fall into zero,
          * one, or more than one group.  See below for some examples.
@@ -156,7 +156,7 @@ var overviewerConfig = {
          *     checked : boolean.  Set to true to have the group visible by default
          */
         'regions': [
-            //{'label':'All','clickable':true,'match':function(region){return true;}}
+            {label: 'All', checked: true, clickable: true, match: function(r) {return true;}}
         ]
     },
     /* mapTypes -- a list of alternate map renderings available. At least one
