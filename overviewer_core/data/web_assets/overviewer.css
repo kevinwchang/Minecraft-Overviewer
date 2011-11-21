@@ -160,6 +160,9 @@ div.searchResultItem img {
         -2px 2px 5px black,
          2px 2px 5px black;
     white-space: nowrap;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 /* vim: set expandtab shiftwidth=4 tabstop=4: */

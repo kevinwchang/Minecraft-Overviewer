@@ -156,6 +156,7 @@ var overviewer = {
                 }
             }
         },
+        'initMapListener': null,
         /**
          * This is where the magic happens. We setup the map with all it's
          * options. The query string is also parsed here so we can know if
@@ -256,18 +257,24 @@ var overviewer = {
             }
             
             // Jump to the hash if given
-            overviewer.util.initHash();
+            if(window.location.hash.split("/").length > 1) {
+                overviewer.util.initMapListener = google.maps.event.addListener(overviewer.map, 'tilesloaded', function() {
+                    overviewer.util.initHash();
+                });
+                // Add a marker indicating the user-supplied position
+                /*var coords = window.location.hash.split("/");
+                var coordinates = {x: parseInt(coords[1]), y:  parseInt(coords[2]), z: parseInt(coords[3])};
+                overviewer.collections.markerDatas.push([{
+                    'msg': 'Coordinates ' + Math.floor(coordinates.x) + ', ' + Math.floor(coordinates.y) + ', ' + Math.floor(coordinates.z),
+                    'x': coordinates.x,
+                    'y': coordinates.y,
+                    'z': coordinates.z,
+                    'type': 'querypos'}]);*/
+            }
             
             // Add live hash update listeners
             // Note: It is important to add them after jumping to the hash
-            google.maps.event.addListener(overviewer.map, 'dragend', function() {
-                overviewer.util.updateHash();
-            });
-            
-            google.maps.event.addListener(overviewer.map, 'zoom_changed', function() {
-                overviewer.util.updateHash();
-            });
-            google.maps.event.addListener(overviewer.map, 'dblclick', function() {
+            google.maps.event.addListener(overviewer.map, 'idle', function() {
                 overviewer.util.updateHash();
             });
             
@@ -976,20 +983,8 @@ var overviewer = {
             });
         },
         'initHash': function() {
-            if(window.location.hash.split("/").length > 1) {
-                overviewer.util.goToHash();
-                // Clean up the hash.
-                overviewer.util.updateHash();
-                
-                // Add a marker indicating the user-supplied position
-                var coordinates = overviewer.util.fromLatLngToWorld(overviewer.map.getCenter().lat(), overviewer.map.getCenter().lng());
-                overviewer.collections.markerDatas.push([{
-                    'msg': 'Coordinates ' + Math.floor(coordinates.x) + ', ' + Math.floor(coordinates.y) + ', ' + Math.floor(coordinates.z),
-                    'x': coordinates.x,
-                    'y': coordinates.y,
-                    'z': coordinates.z,
-                    'type': 'querypos'}]);
-            }
+            overviewer.util.goToHash();
+            google.maps.event.removeListener(overviewer.util.initMapListener);
         },
         'setHash': function(x, y, z, zoom, maptype)    {
             // remove the div prefix from the maptype (looks better)
