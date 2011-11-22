@@ -258,7 +258,7 @@ var overviewer = {
             
             // Jump to the hash if given
             if(window.location.hash.split("/").length > 1) {
-                overviewer.util.initMapListener = google.maps.event.addListener(overviewer.map, 'tilesloaded', function() {
+                overviewer.util.initMapListener = google.maps.event.addListener(overviewer.map, 'idle', function() {
                     overviewer.util.initHash();
                 });
                 // Add a marker indicating the user-supplied position
