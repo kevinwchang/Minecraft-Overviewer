@@ -270,13 +270,12 @@ var overviewer = {
                     'y': coordinates.y,
                     'z': coordinates.z,
                     'type': 'querypos'}]);*/
+            } else {
+                // Add live hash update listeners
+                google.maps.event.addListener(overviewer.map, 'idle', function() {
+                    overviewer.util.updateHash();
+                });
             }
-            
-            // Add live hash update listeners
-            // Note: It is important to add them after jumping to the hash
-            google.maps.event.addListener(overviewer.map, 'idle', function() {
-                overviewer.util.updateHash();
-            });
             
             // Make the link again whenever the map changes
             google.maps.event.addListener(overviewer.map, 'maptypeid_changed', function() {
@@ -985,6 +984,9 @@ var overviewer = {
         'initHash': function() {
             overviewer.util.goToHash();
             google.maps.event.removeListener(overviewer.util.initMapListener);
+            google.maps.event.addListener(overviewer.map, 'idle', function() {
+                overviewer.util.updateHash();
+            });
         },
         'setHash': function(x, y, z, zoom, maptype)    {
             // remove the div prefix from the maptype (looks better)
