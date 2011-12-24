@@ -135,7 +135,7 @@ class QuadtreeGen(object):
 
     def _increase_depth(self):
         """Moves existing tiles into place for a larger tree"""
-        getpath = functools.partial(os.path.join, self.destdir, self.tiledir)
+        getpath = functools.partial(os.path.join, self.full_tiledir)
 
         # At top level of the tree:
         # quadrant 0 is now 0/3
@@ -162,7 +162,7 @@ class QuadtreeGen(object):
     def _decrease_depth(self):
         """If the map size decreases, or perhaps the user has a depth override
         in effect, re-arrange existing tiles for a smaller tree"""
-        getpath = functools.partial(os.path.join, self.destdir, self.tiledir)
+        getpath = functools.partial(os.path.join, self.full_tiledir)
 
         # quadrant 0/3 goes to 0
         # 1/2 goes to 1
@@ -203,6 +203,12 @@ class QuadtreeGen(object):
         employ some simple re-arranging of tiles to save on computation.
         
         """
+
+        # If the tile directory has been deleted somehow, then don't bother
+        # trying to rearrange things. It wouldn't do any good and would error
+        # out anyways.
+        if not os.path.exists(self.full_tiledir):
+            return
 
         curdepth = self._get_cur_depth()
         if curdepth != -1:
@@ -264,7 +270,7 @@ class QuadtreeGen(object):
                     
         return chunklist   
         
-    def get_uppertiles(self,zoom):
+    def get_compositetiles(self,zoom):
         """Returns the inner tiles at the given zoom level that need to be rendered
 
         """    
@@ -276,7 +282,7 @@ class QuadtreeGen(object):
   
             yield [self,tilepath, name]
     
-    def render_uppertile(self, dest, name):
+    def render_compositetile(self, dest, name):
         """
         Renders a tile at os.path.join(dest, name)+".ext" by taking tiles from
         os.path.join(dest, name, "{0,1,2,3}.png")
@@ -331,7 +337,7 @@ class QuadtreeGen(object):
         # quit now if we don't need rerender
         if not needs_rerender:
             return    
-        #logging.debug("writing out uppertile {0}".format(imgpath))
+        #logging.debug("writing out compositetile {0}".format(imgpath))
 
         # Create the actual image now
         img = Image.new("RGBA", (384, 384), self.bgcolor)
@@ -819,7 +825,7 @@ class Tile(object):
     """A simple container class that represents a single render-tile.
 
     A render-tile is a tile that is rendered, not a tile composed of other
-    tiles (upper-tile).
+    tiles (composite-tile).
 
     """
     __slots__ = ("col", "row", "path")
