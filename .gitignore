@@ -33,3 +33,4 @@ overviewer_core/overviewer_version.py
 *.bat
 
 world/
+render.log
