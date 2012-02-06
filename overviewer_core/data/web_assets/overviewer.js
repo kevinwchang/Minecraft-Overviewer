@@ -275,6 +275,9 @@ var overviewer = {
                 google.maps.event.addListener(overviewer.map, 'idle', function() {
                     overviewer.util.updateHash();
                 });
+                google.maps.event.addListener(overviewer.map, 'zoom_changed', function() {
+                    overviewer.util.updateRegions();
+                });
             }
             
             // Make the link again whenever the map changes
@@ -368,9 +371,16 @@ var overviewer = {
 
                     if (item.msg.match(/^\s*#/)) {
                         var infowindow = new InfoBox();
-                        // Replace our Info Window's content and position
-                        var contentString = item.msg.replace(/(^\s*#+\s*)|(\s*#+\s*$)/g, '');
-                        infowindow.setContent(contentString);
+                        var rMaxZoomMatch = item.msg.match(/^\s*#+0*(\d+)/);
+                        var contentString = item.msg.replace(/(^\s*#+\d*\s*)|(\s*#+\s*$)/g, ''); // get rid of hashes
+
+                        if (rMaxZoomMatch != null) {
+                            infowindow.setContent("<!--" + rMaxZoomMatch[1] + "-->" + contentString);
+                            infowindow.setOptions({boxClass: "infoBox rMaxZoom" + rMaxZoomMatch[1]});
+                        }
+                        else
+                            infowindow.setContent(contentString);
+
                         infowindow.setPosition(overviewer.util.fromWorldToLatLng(item.x, item.y, item.z));
                         infowindow.setOptions({closeBoxURL: "", maxWidth: 0});
                         infowindow.open(overviewer.map);
@@ -748,14 +758,8 @@ var overviewer = {
                     items.push({
                         'label': regionGroup.label, 
                         'checked': regionGroup.checked,
-                        'action': function(n, item, checked) {
-                            jQuery.each(overviewer.collections.regionWindows,
-                                function(i,elem) {
-                                    // Thanks to LeastWeasel for this line!
-                                    elem.setMap(checked ? overviewer.map : null);
-                                });
-                                overviewer.util.debug('Adding region item: ' + item);
-
+                        'action': function() {
+                            overviewer.util.updateRegions();
                         }
                     });
                 }
@@ -834,6 +838,7 @@ var overviewer = {
                 var itemDiv = document.createElement('div');
                 var itemInput = document.createElement('input');
                 itemInput.type='checkbox';
+                itemInput.id = "chk" + title + item.label;
 
                 // give it a name
                 $(itemInput).data('label',item.label);
@@ -987,6 +992,10 @@ var overviewer = {
             google.maps.event.addListener(overviewer.map, 'idle', function() {
                 overviewer.util.updateHash();
             });
+            google.maps.event.addListener(overviewer.map, 'zoom_changed', function() {
+                overviewer.util.updateRegions();
+            });
+            overviewer.util.updateRegions();
         },
         'setHash': function(x, y, z, zoom, maptype)    {
             // remove the div prefix from the maptype (looks better)
@@ -1061,6 +1070,17 @@ var overviewer = {
             
             overviewer.map.setCenter(latlngcoords);
             overviewer.map.setZoom(zoom);
+        },
+        'updateRegions': function() {
+            jQuery.each(overviewer.collections.regionWindows,
+                function(i,elem) {
+                    var rMaxZoomMatch = elem.getContent().match(/<!--(\d+)-->/);
+                    if ((document.getElementById("chkRegionsAll") == null || document.getElementById("chkRegionsAll").checked)
+                        && (rMaxZoomMatch == null || overviewerConfig.map.maxZoom - overviewer.map.getZoom() <= rMaxZoomMatch[1]))
+                      elem.show();
+                    else
+                      elem.hide();
+                });
         }
     },
     /**
