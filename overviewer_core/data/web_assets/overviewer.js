@@ -470,43 +470,7 @@ var overviewer = {
                         if (!region.label) {
                             clickable = false; // if it doesn't have a name, we dont have to show it.
                         }
-						
-						
-						
-						/////////////////////
-						//STEVE'S SCRIPT
-						/////////////////////
-						
-						var urlZoomArray = document.URL.split('/');
-						var urlZoom = urlZoomArray[9];	//8 or 9?
-						if(urlZoom == 'min')
-							urlZoom = 0;
-						else if(urlZoom == 'max')
-							urlZoom = -12;
-						urlZoom *= -1;	//convert the value from the URL from negative to positive
-						
-						alert('urlZoom = ' + urlZoom + '\n(should be min, max, or -1 to -11)');
-						alert('region.label = ' + region.label);
-						
-						if(region.label.charAt(0) == '#')
-						{
-							var zoomOnSign = parseInt(region.label.substring(1,2));
-							
-							//alert('zoomOnSign = ' + zoomOnSign);
-							
-							if(isNaN(zoomOnSign) || urlZoom > zoomOnSign)	//if we're zoomed out farther than the sign says - don't show it
-							{
-								//alert('urlZoom = ' + urlZoom + '\nzoomOnSign = ' + zoomOnSign + '\nhiding label <'+region.label+'>')
-								clickable = false;
-							}
-						}
-						
-						/////////////////////
-						//END STEVE'S SCRIPT
-						/////////////////////
-						
-						
-						
+
                         if (region.closed) {
                             var shape = new google.maps.Polygon(shapeOptions);
                         } else {
