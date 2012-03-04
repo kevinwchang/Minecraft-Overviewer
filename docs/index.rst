@@ -6,9 +6,11 @@
 The Minecraft Overviewer
 ========================
 
-See also the `Github Homepage`_
+See also the `Github Homepage`_ and the `Updates Blog`_
 
 .. _Github Homepage: https://github.com/overviewer/Minecraft-Overviewer
+
+.. _Updates Blog: http://overviewer.org/blog/
 
 Introduction
 ============
@@ -109,11 +111,17 @@ our `Github Homepage`_.
 packages and don't want to have to compile anything yourself**, head to the
 :doc:`installing` page.
 
+**Running Windows and not familiar with the command line?** Head to the
+:doc:`win_tut/windowsguide` page.
+
 **If you would like to build the Overviewer from source yourself (it's not that
 bad)**, head to the :doc:`Building <building>` page.
 
 **For all other platforms** you will need to build it yourself.
 :doc:`building`.
+
+**After you have The Overviewer built/installed** see :doc:`running` and
+:doc:`config`.
 
 .. _help:
 
@@ -142,7 +150,8 @@ Documentation Contents
    installing
    building
    running
-   options
+   config
+   win_tut/windowsguide
    faq
    design/designdoc
 
