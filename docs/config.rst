@@ -289,7 +289,7 @@ values. The valid configuration keys are listed below.
         .. note::
 
             Selecting this rendermode doesn't automatically render your nether
-            dimention.  Be sure to also set the
+            dimension.  Be sure to also set the
             :ref:`dimension<option_dimension>` option to 'nether'.
         
     ``"nether_lighting"``
@@ -362,8 +362,8 @@ values. The valid configuration keys are listed below.
     You can use this to render a small subset of your map, instead of the entire
     thing. The format is (min x, min z, max x, max z).
 
-    (The coordinates are block coordinates. The same you get with the debug menu
-    in-game)
+    The coordinates are block coordinates. The same you get with the debug menu
+    in-game and the coordinates shown when you view a map.
 
     Example that only renders a 1000 by 1000 square of land about the origin::
 
@@ -373,19 +373,29 @@ values. The valid configuration keys are listed below.
                 'crop': (-500, -500, 500, 500),
         }
 
+    This option performs a similar function to the old ``--regionlist`` option
+    (which no longer exists). It is useful for example if someone has wandered
+    really far off and made your map too large. You can set the crop for the
+    largest map you want to render (perhaps ``(-10000,-10000,10000,10000)``). It
+    could also be used to define a really small render showing off one
+    particular feature, perhaps from multiple angles.
+
     .. warning::
 
         If you decide to change the bounds on a render, you may find it produces
-        unexpected results.
+        unexpected results. It is recommended to not change the crop settings
+        once it has been rendered once.
 
         For an expansion to the bounds, because chunks in the new bounds have
         the same mtime as the old, tiles will not automatically be updated. You
         may need to use :option:`--forcerender` to force those tiles to update.
+        (You can define the ``forcerender`` option on just one render)
 
         For reductions to the bounds, because there is currently no mechanism to
         detect tiles that shouldn't exist but do, old tiles may remain and will
         not get deleted. The only fix for this currently is to delete that
-        render directory and render it again with :option:`--forcerender`. 
+        render directory entirely and render it again with
+        :option:`--forcerender`. 
 
 ``forcerender``
     This is a boolean. If set to ``True`` (or any non-false value) then this
@@ -415,6 +425,23 @@ values. The valid configuration keys are listed below.
                 'title': "Forced Example",
                 'forcerender': True,
         }
+
+``changelist``
+    This is a string. It names a file where it will write out, one per line, the
+    path to tiles that have been updated. You can specify the same file for
+    multiple (or all) renders and they will all be written to the same file. The
+    file is cleared when The Overviewer starts.
+
+    This option is useful in conjunction with a simple upload script, to upload
+    the files that have changed.
+
+    .. warning::
+
+        A solution like ``rsync -a --delete`` is much better because it also
+        watches for tiles that should be *deleted*, which is impossible to
+        convey with the changelist option. If your map ever shrinks or you've
+        removed some tiles, you may need to do some manual deletion on the
+        remote side.
 
 .. _customrendermodes:
 

@@ -16,15 +16,17 @@
 """This module has supporting functions for the caching logic used in world.py.
 
 Each cache class should implement the standard container type interface
-(__getitem__ and __setitem__, as well as provide a "hits" and "misses"
+(__getitem__ and __setitem__), as well as provide a "hits" and "misses"
 attribute.
 
 """
 import functools
 import logging
+import cPickle
 
 class LRUCache(object):
-    """A simple in-memory LRU cache.
+    """A simple, generic, in-memory LRU cache that implements the standard
+    python container interface.
 
     An ordered dict type would simplify this implementation a bit, but we want
     Python 2.6 compatibility and the standard library ordereddict was added in
@@ -47,7 +49,14 @@ class LRUCache(object):
             self.key = k
             self.value = v
 
-    def __init__(self, size=100):
+    def __init__(self, size=100, destructor=None):
+        """Initialize a new LRU cache with the given size.
+
+        destructor, if given, is a callable that is called upon an item being
+        evicted from the cache. It takes one argument, the value stored in the
+        cache.
+
+        """
         self.cache = {}
 
         self.listhead = LRUCache._LinkNode()
@@ -61,6 +70,8 @@ class LRUCache(object):
         self.misses = 0
 
         self.size = size
+
+        self.destructor = destructor
 
     # Initialize an empty cache of the same size for worker processes
     def __getstate__(self):
@@ -92,13 +103,18 @@ class LRUCache(object):
     def __setitem__(self, key, value):
         cache = self.cache
         if key in cache:
-            raise KeyError("That key already exists in the cache!")
+            # Shortcut this case
+            cache[key].value = value
+            return
         if len(cache) >= self.size:
             # Evict a node
             link = self.listhead.right
             del cache[link.key]
             link.left.right = link.right
             link.right.left = link.left
+            d = self.destructor
+            if d:
+                d(link.value)
             del link
 
         # The node doesn't exist already, and we have room for it. Let's do this.
@@ -109,3 +125,30 @@ class LRUCache(object):
 
         cache[key] = link
 
+# memcached is an option, but unless your IO costs are really high, it just
+# ends up adding overhead and isn't worth it.
+try:
+    import memcache
+except ImportError:
+    class Memcached(object):
+        def __init__(*args):
+            raise ImportError("No module 'memcache' found. Please install python-memcached")
+else:
+    class Memcached(object):
+        def __init__(self, conn='127.0.0.1:11211'):
+            self.conn = conn
+            self.mc = memcache.Client([conn], debug=0, pickler=cPickle.Pickler, unpickler=cPickle.Unpickler)
+
+        def __getstate__(self):
+            return self.conn
+        def __setstate__(self, conn):
+            self.__init__(conn)
+
+        def __getitem__(self, key):
+            v = self.mc.get(key)
+            if not v:
+                raise KeyError()
+            return v
+
+        def __setitem__(self, key, value):
+            self.mc.set(key, value)
