@@ -190,6 +190,8 @@ class World(object):
         
         # Open up the chunk that the spawn is in
         regionset = self.get_regionset("overworld")
+        if not regionset:
+            return None
         try:
             chunk = regionset.get_chunk(chunkX, chunkZ)
         except ChunkDoesntExist:
@@ -244,7 +246,7 @@ class RegionSet(object):
         # This is populated below. It is a mapping from (x,y) region coords to filename
         self.regionfiles = {}
 
-        # This holds up to 16 open regionfile objects
+        # This holds a cache of open regionfile objects
         self.regioncache = cache.LRUCache(size=16, destructor=lambda regionobj: regionobj.close())
         
         for x, y, regionfile in self._iterate_regionfiles():
@@ -277,6 +279,8 @@ class RegionSet(object):
             raise Exception("Woah, what kind of dimension is this?! %r" % self.regiondir)
 
     def _get_regionobj(self, regionfilename):
+        # Check the cache first. If it's not there, create the
+        # nbt.MCRFileReader object, cache it, and return it
         try:
             return self.regioncache[regionfilename]
         except KeyError:
@@ -315,8 +319,36 @@ class RegionSet(object):
         if regionfile is None:
             raise ChunkDoesntExist("Chunk %s,%s doesn't exist (and neither does its region)" % (x,z))
 
-        region = self._get_regionobj(regionfile)
-        data = region.load_chunk(x, z)
+        # Try a few times to load and parse this chunk before giving up and
+        # raising an error
+        tries = 5
+        while True:
+            try:
+                region = self._get_regionobj(regionfile)
+                data = region.load_chunk(x, z)
+            except nbt.CorruptionError, e:
+                tries -= 1
+                if tries > 0:
+                    # Flush the region cache to possibly read a new region file
+                    # header
+                    logging.debug("Encountered a corrupt chunk at %s,%s. Flushing cache and retrying", x, z)
+                    logging.debug("Error was:", exc_info=1)
+                    del self.regioncache[regionfile]
+                    time.sleep(0.5)
+                    continue
+                else:
+                    logging.warning("Tried several times to read chunk %d,%d. Giving up.",
+                            x, z, e)
+                    logging.debug("Full traceback:", exc_info=1)
+                    # Let this exception propagate out through the C code into
+                    # tileset.py, where it is caught and gracefully continues
+                    # with the next chunk
+                    raise
+            else:
+                # no exception raised: break out of the loop
+                break
+
+
         if data is None:
             raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
 
@@ -597,7 +629,10 @@ class CachedRegionSet(RegionSetWrapper):
             s += obj.__class__.__name__ + "."
             obj = obj._r
         # obj should now be the actual RegionSet object
-        s += obj.regiondir
+        try:
+            s += obj.regiondir
+        except AttributeError:
+            s += repr(obj)
 
         logging.debug("Initializing a cache with key '%s'", s)
 
