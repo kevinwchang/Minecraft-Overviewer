@@ -140,11 +140,14 @@ div.searchResultItem img {
     height: 24px;
 }
 
-@font-face { font-family: 'mapfont'; src: url('GazelleFLF.ttf'); } 
+@font-face {
+    font-family: 'label-font';
+    src: url('GazelleFLF.ttf');
+} 
 
-.infoBox {
+.mapLabel {
     text-align: center;
-    font-family: 'mapfont';
+    font-family: 'label-font';
     font-size: 24px;
     color: moccasin;
   /*background: rgba(0, 0, 0, 0.6);
@@ -157,12 +160,9 @@ div.searchResultItem img {
         0px  2px 5px black,
        -2px -2px 5px black,
         2px -2px 5px black,
-        -2px 2px 5px black,
-         2px 2px 5px black;
+       -2px  2px 5px black,
+        2px  2px 5px black;
     white-space: nowrap;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
 }
 
 /* vim: set expandtab shiftwidth=4 tabstop=4: */

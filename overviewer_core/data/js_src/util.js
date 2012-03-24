@@ -59,8 +59,8 @@ overviewer.util = {
         coordsdiv.render();
 
         if (overviewer.collections.haveSigns) {
-            var signs = new overviewer.views.SignControlView();
-            signs.registerEvents(signs);
+            overviewer.signs = new overviewer.views.SignControlView();
+            overviewer.signs.registerEvents(overviewer.signs);
         }
 
         var spawnmarker = new overviewer.views.SpawnIconView();

@@ -1,10 +1,10 @@
-def allSignsFilter(poi):
-	"Signs"
-	return poi['id'] == 'Sign'
+import markerfilters
 
 worlds['world'] = 'world'
 
 outputdir = '/var/www/minecraft/map'
+
+filters = [markerfilters.labelsign, markerfilters.normalsign]
 
 renders['day'] = {
 	'world': 'world',
@@ -12,7 +12,7 @@ renders['day'] = {
 	'rendermode': 'smooth_lighting',
 	'dimension': 'overworld',
 	'northdirection': 'upper-right',
-	'markers': [allSignsFilter],
+	'markers': filters
 }
 
 renders['night'] = {
@@ -21,7 +21,7 @@ renders['night'] = {
 	'rendermode': 'smooth_night',
 	'dimension': 'overworld',
 	'northdirection': 'upper-right',
-	'markers': [allSignsFilter],
+	'markers': filters
 }
 
 imgformat = 'jpg'

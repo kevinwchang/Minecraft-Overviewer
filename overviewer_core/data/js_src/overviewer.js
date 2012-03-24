@@ -103,3 +103,7 @@ overviewer.gmap = {
             }
         }
 };
+
+overviewer.signs = null;
+overviewer.labelGroup = '';
+overviewer.labelLoadListener = null;
