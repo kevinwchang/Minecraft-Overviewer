@@ -1,3 +1,7 @@
+def allSignsFilter(poi):
+	"Signs"
+	return poi['id'] == 'Sign'
+
 worlds['world'] = 'world'
 
 outputdir = '/var/www/minecraft/map'
@@ -8,6 +12,7 @@ renders['day'] = {
 	'rendermode': 'smooth_lighting',
 	'dimension': 'overworld',
 	'northdirection': 'upper-right',
+	'markers': [allSignsFilter],
 }
 
 renders['night'] = {
@@ -16,6 +21,7 @@ renders['night'] = {
 	'rendermode': 'smooth_night',
 	'dimension': 'overworld',
 	'northdirection': 'upper-right',
+	'markers': [allSignsFilter],
 }
 
 imgformat = 'jpg'
