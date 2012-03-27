@@ -14,5 +14,5 @@ def labelsign(poi):
 
 def normalsign(poi):
 	"Signs"
-	return poi['id'] == 'Sign' and not islabelsign(poi)
+	return poi['id'] == 'Sign' and not islabelsign(poi) and not fulltext(poi).strip() == ''
 
