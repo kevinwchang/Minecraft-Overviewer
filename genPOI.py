@@ -23,10 +23,6 @@ from overviewer_core import logger
 from overviewer_core import nbt
 from overviewer_core import configParser, world
 
-helptext = """
-%prog --config=<config file>"""
-
-logger.configure()
 
 def handleSigns(rset, outputdir, render, rname):
     	
@@ -45,13 +41,22 @@ def handleSigns(rset, outputdir, render, rname):
 
 
 def main():
+    helptext = """genPOI
+    %prog --config=<config file>"""
+
+    logger.configure()
+
     parser = OptionParser(usage=helptext)
     parser.add_option("--config", dest="config", action="store", help="Specify the config file to use.")
+    parser.add_option("--quiet", dest="quiet", action="count", help="Reduce logging output")
 
     options, args = parser.parse_args()
     if not options.config:
         parser.print_help()
         return
+
+    if options.quiet > 0:
+        logger.configure(logging.WARN, False)
 
     # Parse the config file
     mw_parser = configParser.MultiWorldParser()
