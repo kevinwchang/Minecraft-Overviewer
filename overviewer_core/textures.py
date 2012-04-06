@@ -124,14 +124,14 @@ class Textures(object):
 
         * The overviewer_core/data/textures dir
         
-        In all of these, files are searched for in '.', 'misc/', and
+        In all of these, files are searched for in '.', 'anim', 'misc/', and
         'environment/'.
         
         """
 
         # a list of subdirectories to search for a given file,
         # after the obvious '.'
-        search_dirs = ['misc', 'environment']
+        search_dirs = ['anim', 'misc', 'environment']
         search_zip_paths = [filename,] + [d + '/' + filename for d in search_dirs]
         def search_dir(base):
             """Search the given base dir for filename, in search_dirs."""
@@ -852,7 +852,7 @@ block(blockid=15, top_index=33)
 # coal ore
 block(blockid=16, top_index=34)
 
-@material(blockid=17, data=range(3), solid=True)
+@material(blockid=17, data=range(4), solid=True)
 def wood(self, blockid, data):
     top = self.terrain_images[21]
     if data == 0: # normal
@@ -866,6 +866,9 @@ def wood(self, blockid, data):
 
 @material(blockid=18, data=range(16), transparent=True, solid=True)
 def leaves(self, blockid, data):
+    # mask out the bits 4 and 8
+    # they are used for player placed and check-for-decay blocks
+    data = data & 0x3
     t = self.terrain_images[52]
     if data == 1:
         # pine!
@@ -1946,7 +1949,7 @@ def door(self, blockid, data):
     return img
 
 # ladder
-@material(blockd=65, data=[2, 3, 4, 5], transparent=True)
+@material(blockid=65, data=[2, 3, 4, 5], transparent=True)
 def ladder(self, blockid, data):
 
     # first rotations
@@ -1966,28 +1969,28 @@ def ladder(self, blockid, data):
         elif data == 4: data = 3
         elif data == 5: data = 2
 
-    img = Image.new("RGBA", (24,24), bgcolor)
-    raw_texture = terrain_images[83]
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+    raw_texture = self.terrain_images[83]
 
     if data == 5:
         # normally this ladder would be obsured by the block it's attached to
         # but since ladders can apparently be placed on transparent blocks, we 
         # have to render this thing anyway.  same for data == 2
-        tex = transform_image_side(raw_texture)
+        tex = self.transform_image_side(raw_texture)
         alpha_over(img, tex, (0,6), tex)
-        return generate_texture_tuple(img, blockID)
+        return img
     if data == 2:
-        tex = transform_image_side(raw_texture).transpose(Image.FLIP_LEFT_RIGHT)
+        tex = self.transform_image_side(raw_texture).transpose(Image.FLIP_LEFT_RIGHT)
         alpha_over(img, tex, (12,6), tex)
-        return generate_texture_tuple(img, blockID)
+        return img
     if data == 3:
-        tex = transform_image_side(raw_texture).transpose(Image.FLIP_LEFT_RIGHT)
+        tex = self.transform_image_side(raw_texture).transpose(Image.FLIP_LEFT_RIGHT)
         alpha_over(img, tex, (0,0), tex)
-        return generate_texture_tuple(img, blockID)
+        return img
     if data == 4:
-        tex = transform_image_side(raw_texture)
+        tex = self.transform_image_side(raw_texture)
         alpha_over(img, tex, (12,0), tex)
-        return generate_texture_tuple(img, blockID)
+        return img
 
 
 # wall signs
