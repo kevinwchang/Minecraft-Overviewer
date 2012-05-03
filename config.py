@@ -4,7 +4,10 @@ worlds['world'] = 'world'
 
 outputdir = '/var/www/minecraft/map'
 
-filters = [markerfilters.labelsign, markerfilters.normalsign]
+filters = [
+	dict(name = 'Labels',  filterFunction = markerfilters.labelsign),
+	dict(name = 'Signs',   filterFunction = markerfilters.normalsign),
+	dict(name = 'Players', filterFunction = markerfilters.playericons)]
 
 renders['day'] = {
 	'world': 'world',
