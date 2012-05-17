@@ -70,7 +70,7 @@ A more complicated example
 
     renders["survivalnight"] = {
         "world": "survival",
-        "title": "Survival Daytime",
+        "title": "Survival Nighttime",
         "rendermode": smooth_night,
         "dimension": "overworld",
     }
@@ -432,11 +432,12 @@ values. The valid configuration keys are listed below.
 
     **Default:** ``#1a1a1a``
 
-.. _option_texture_pack:
+.. _option_texturepath:
 
 ``texturepath``
     This is a where a specific texture pack can be found to be used during this render.
-    It can be either a folder or a directory. Its value should be a string.
+    It can be either a folder or a zip file containing the texture pack.
+    Its value should be a string.
 
 .. _crop:
 
