@@ -465,7 +465,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
                     if(dataRoot[i].displayName == 'Labels') {
                       var text = jQuery.trim(entity.text);
                       var lMaxZoomMatch = text.match(/^\s*#+0*(\d+)/);
-                      var labelContent = text.replace(/(^\s*#+\d*\s*)|(\s*#+\s*$)/g, '');
+                      var labelContent = text.replace(/(^\s*#+\d*\s*)|(\s*#+\s*$)/g, '').replace(/\n/g,'<br/>');
                       var labelClass = 'mapLabel';
 
                       if (lMaxZoomMatch != null) {

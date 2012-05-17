@@ -3,7 +3,7 @@ import re
 # helpers
 
 def fulltext(poi):
-	return poi['Text1'] + poi['Text2'] + poi['Text3'] + poi['Text4']
+	return '\n'.join([poi['Text1'], poi['Text2'], poi['Text3'], poi['Text4']])
 
 label_re = re.compile('^\s*#')
 
