@@ -3,6 +3,7 @@ import markerfilters
 worlds['world'] = 'world'
 
 outputdir = '/var/www/minecraft/map'
+base = 'http://tiles.iprefermuffins.com:8042/minecraft/map/'
 
 filters = [
 	dict(name = 'Labels',  filterFunction = markerfilters.labelsign),
