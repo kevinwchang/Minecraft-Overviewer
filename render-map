@@ -4,4 +4,7 @@ wget -N http://s3.amazonaws.com/MinecraftDownload/minecraft.jar -P ~/.minecraft/
 rsync -a --delete ../world .
 python overviewer.py --config config.py
 python overviewer.py --config config.py --genpoi
+
+keychain id_rsa
+. ~/.keychain/`uname -n`-sh
 rsync -acvz --files-from=rsync-include -e ssh /var/www/minecraft/map/ nfsipm:/home/public/
