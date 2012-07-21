@@ -58,6 +58,10 @@ overviewer.util = {
         var coordsdiv = new overviewer.views.CoordboxView({tagName: 'DIV'});
         coordsdiv.render();
 
+        var progressdiv = new overviewer.views.ProgressView({tagName: 'DIV'});
+        progressdiv.render();
+        progressdiv.updateProgress();
+
         if (overviewer.collections.haveSigns) {
             overviewer.signs = new overviewer.views.SignControlView();
             overviewer.signs.registerEvents(overviewer.signs);

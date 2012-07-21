@@ -26,7 +26,7 @@
 
 // increment this value if you've made a change to the c extesion
 // and want to force users to rebuild
-#define OVERVIEWER_EXTENSION_VERSION 38
+#define OVERVIEWER_EXTENSION_VERSION 39
 
 /* Python PIL, and numpy headers */
 #include <Python.h>
@@ -69,6 +69,8 @@ PyObject *draw_triangle(PyObject *dest, int inclusive,
                         int x2, int y2,
                         unsigned char r2, unsigned char g2, unsigned char b2,
                         int tux, int tuy, int *touchups, unsigned int num_touchups);
+PyObject *resize_half(PyObject *dest, PyObject *src);
+PyObject *resize_half_wrap(PyObject *self, PyObject *args);
 
 /* forward declaration of RenderMode object */
 typedef struct _RenderMode RenderMode;

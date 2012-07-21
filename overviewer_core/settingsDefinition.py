@@ -45,7 +45,7 @@
 
 from settingsValidators import *
 import util
-from observer import ProgressBarObserver, LoggingObserver
+from observer import ProgressBarObserver, LoggingObserver, JSObserver
 import platform
 import sys
 
@@ -71,6 +71,7 @@ renders = Setting(required=True, default=util.OrderedDict(),
             "imgformat": Setting(required=True, validator=validateImgFormat, default="png"),
             "imgquality": Setting(required=False, validator=validateImgQuality, default=95),
             "bgcolor": Setting(required=True, validator=validateBGColor, default="1a1a1a"),
+            "defaultzoom": Setting(required=True, validator=validateDefaultZoom, default=1),
             "optimizeimg": Setting(required=True, validator=validateOptImg, default=0),
             "nomarkers": Setting(required=False, validator=validateBool, default=None),
             "texturepath": Setting(required=False, validator=validateTexturePath, default=None),
