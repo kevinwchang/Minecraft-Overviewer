@@ -525,7 +525,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
                               'isHidden':   true
                       });
                       infobox.open(overviewer.map);
-                      jQuery.extend(entity, {infoboxObj: infobox});
+                    	dataRoot[i].infoBoxObjs.push(marker);
                     } else {
                       if (entity['icon']) {
                           iconURL = entity['icon'];
@@ -596,12 +596,12 @@ overviewer.views.SignControlView = Backbone.View.extend({
 
       zoom = overviewer.mapView.options.currentTileSet.get('maxZoom') - overviewer.map.getZoom();
 
-      jQuery.each(markersDB[overviewer.labelGroup].raw, function(i, elem) {
-        var lMaxZoomMatch = elem.infoboxObj.getContent().match(/<!--(\d+)-->/);
+      jQuery.each(labelGroup.infoBoxObjs, function(i, infoBoxObj) {
+        var lMaxZoomMatch = infoBoxObj.getContent().match(/<!--(\d+)-->/);
         if (document.getElementById('chkMarkersLabels').checked && (lMaxZoomMatch == null || zoom <= lMaxZoomMatch[1])) {
-          elem.infoboxObj.show();
+          infoBoxObj.show();
         } else {
-          elem.infoboxObj.hide();
+          infoBoxObj.hide();
         }
       });
     },

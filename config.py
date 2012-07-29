@@ -16,7 +16,8 @@ renders['day'] = {
 	'rendermode': 'smooth_lighting',
 	'dimension': 'overworld',
 	'northdirection': 'upper-right',
-	'markers': filters
+	'markers': filters,
+	'poititle': 'Markers'
 }
 
 renders['night'] = {
@@ -25,7 +26,8 @@ renders['night'] = {
 	'rendermode': 'smooth_night',
 	'dimension': 'overworld',
 	'northdirection': 'upper-right',
-	'markers': filters
+	'markers': filters,
+	'poititle': 'Markers'
 }
 
 imgformat = 'jpg'
