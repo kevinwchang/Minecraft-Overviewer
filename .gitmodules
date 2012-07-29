@@ -1,3 +1,6 @@
 [submodule "test/data/worlds"]
 	path = test/data/worlds
 	url = git://github.com/overviewer/Overviewer-Test-Data.git
+[submodule "Minecraft-Overviewer-Addons"]
+	path = Minecraft-Overviewer-Addons
+	url = git://github.com/overviewer/Minecraft-Overviewer-Addons.git
