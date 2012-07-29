@@ -559,9 +559,9 @@ overviewer.views.SignControlView = Backbone.View.extend({
     addItem: function(item) {
         var itemDiv = document.createElement('div');
         var itemInput = document.createElement('input');
-        itemInput.type='checkbox';
-        itemInput.checked=(item.label == 'Labels');
-        itemInput.id = 'chkMarkers' + item.label;
+        itemInput.type = 'checkbox';
+        itemInput.checked = (item.group.displayName == 'Labels');
+        itemInput.id = 'chkMarkers' + item.group.displayName;
 
         if (item.group.checked) {
             itemInput.checked="true";
@@ -596,7 +596,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
 
       zoom = overviewer.mapView.options.currentTileSet.get('maxZoom') - overviewer.map.getZoom();
 
-      jQuery.each(labelGroup.markerObjs, function(i, infoBoxObj) {
+      jQuery.each(overviewer.labelGroup.markerObjs, function(i, infoBoxObj) {
         var lMaxZoomMatch = infoBoxObj.getContent().match(/<!--(\d+)-->/);
         if (document.getElementById('chkMarkersLabels').checked && (lMaxZoomMatch == null || zoom <= lMaxZoomMatch[1])) {
           infoBoxObj.show();
