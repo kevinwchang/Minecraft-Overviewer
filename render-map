@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/kevin/minecraft/Minecraft-Overviewer
+cd "$( dirname "$0" )"
 wget -N http://s3.amazonaws.com/MinecraftDownload/minecraft.jar -P ~/.minecraft/bin/
 rsync -a --delete ../world .
 python overviewer.py --config config.py
