@@ -137,7 +137,7 @@ overviewer.views.CoordboxView = Backbone.View.extend({
     }
 });
 
-overviewer.views.ProgressView = Backbone.View.extend({	
+overviewer.views.ProgressView = Backbone.View.extend({  
     initialize: function() {
         this.el.id = 'progressDiv';
         this.el.innerHTML = 'Current Render Progress';
@@ -428,7 +428,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
         });
 
         overviewer.labelLoadListener = google.maps.event.addListener(overviewer.map, 'idle', function() {
-					google.maps.event.removeListener(overviewer.labelLoadListener);
+          google.maps.event.removeListener(overviewer.labelLoadListener);
           overviewer.signs.updateLabels();
         });
     },
@@ -474,21 +474,21 @@ overviewer.views.SignControlView = Backbone.View.extend({
             if (group.displayName == 'Labels') {
               overviewer.labelGroup = group;
               this.addItem({group: group, action:function(this_item, checked) {
-									this_item.group.checked = checked;
+                  this_item.group.checked = checked;
                   overviewer.signs.updateLabels();
               }});
             } else {
-							this.addItem({group: group, action:function(this_item, checked) {
-									this_item.group.checked = checked;
-									jQuery.each(this_item.group.markerObjs, function(i, markerObj) {
-											markerObj.setVisible(checked);
-									});
-							}});
-							if (group.checked) {
-									jQuery.each(group.markerObjs, function(i, markerObj) {
-											markerObj.setVisible(true);
-									});
-							}
+              this.addItem({group: group, action:function(this_item, checked) {
+                  this_item.group.checked = checked;
+                  jQuery.each(this_item.group.markerObjs, function(i, markerObj) {
+                      markerObj.setVisible(checked);
+                  });
+              }});
+              if (group.checked) {
+                  jQuery.each(group.markerObjs, function(i, markerObj) {
+                      markerObj.setVisible(true);
+                  });
+              }
             }
         }
 
@@ -525,7 +525,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
                               'isHidden':   true
                       });
                       infobox.open(overviewer.map);
-                    	dataRoot[i].markerObjs.push(infobox);
+                      dataRoot[i].markerObjs.push(infobox);
                     } else {
                       if (entity['icon']) {
                           iconURL = entity['icon'];
@@ -540,14 +540,14 @@ overviewer.views.SignControlView = Backbone.View.extend({
                               'icon':     iconURL,
                               'visible':  false
                       }); 
-											if(entity['createInfoWindow'] == true) {
-													overviewer.util.createMarkerInfoWindow(marker);
-											} else {
-													if(dataRoot[i].createInfoWindow == true) {
-															overviewer.util.createMarkerInfoWindow(marker);
-													}
-											}
-                    	dataRoot[i].markerObjs.push(marker);
+                      if(entity['createInfoWindow'] == true) {
+                          overviewer.util.createMarkerInfoWindow(marker);
+                      } else {
+                          if(dataRoot[i].createInfoWindow == true) {
+                              overviewer.util.createMarkerInfoWindow(marker);
+                          }
+                      }
+                      dataRoot[i].markerObjs.push(marker);
                     }
                 }
                 dataRoot[i].created = true;
