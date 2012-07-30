@@ -20,9 +20,7 @@ def normalsign(poi):
 	if poi['id'] == 'Sign' and not islabelsign(poi) and not fulltext(poi).strip() == '':
 		return fulltext(poi)
 
-isbot_re = re.compile('bot$')
-
 def playericons(poi):
-	if poi['id'] == 'Player' and isbot_re.search(poi['EntityId']) is None:
+	if poi['id'] == 'Player':
 		poi['icon'] = "http://overviewer.org/avatar/%s" % poi['EntityId']
 		return "Last known location for %s" % poi['EntityId']
