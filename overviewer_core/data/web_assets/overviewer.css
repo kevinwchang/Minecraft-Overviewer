@@ -175,6 +175,11 @@ div.searchResultItem img {
         2px  2px 5px black;
     white-space: nowrap;
     line-height: 1em;
+    width: 256px;
+}
+
+.lMaxZoom1, .lMaxZoom0 {
+    font-size: 16px;
 }
 
 /* vim: set expandtab shiftwidth=4 tabstop=4: */
