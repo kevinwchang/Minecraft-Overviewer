@@ -65,7 +65,8 @@ def handlePlayers(rset, render, worldpath):
     rset._pois['Players'] = []
     for playerfile in playerfiles:
         try:
-            data = nbt.load(os.path.join(playerdir, playerfile))[1]
+            path = os.path.join(playerdir, playerfile)
+            data = nbt.load(path)[1]
             if isSinglePlayer:
                 data = data['Data']['Player']
         except IOError:
@@ -81,6 +82,7 @@ def handlePlayers(rset, render, worldpath):
             data['x'] = int(data['Pos'][0])
             data['y'] = int(data['Pos'][1])
             data['z'] = int(data['Pos'][2])
+            data['mtime'] = os.path.getmtime(path)
             rset._pois['Players'].append(data)
         if "SpawnX" in data and dimension == 0:
             # Spawn position (bed or main spawn)
