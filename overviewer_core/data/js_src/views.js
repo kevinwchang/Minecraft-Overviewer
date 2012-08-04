@@ -374,7 +374,9 @@ overviewer.views.SignControlView = Backbone.View.extend({
     initialize: function(opts) {
         $(this.el).addClass("customControl");
         overviewer.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this.el);
-
+        InfoBox.prototype.setVisible = function(visible) {
+            visible ? this.show() : this.hide();
+        };
     },
     registerEvents: function(me) {
         google.maps.event.addListener(overviewer.map, 'maptypeid_changed', function(event) {
@@ -394,7 +396,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
             jQuery.each(markers, function(key, markerSet) {
                 if (key != curMarkerSet) {
                     jQuery.each(markerSet, function(i, markerGroup) {
-                        if (markerGroup.displayName != 'Labels' && typeof markerGroup.markerObjs != "undefined") {
+                        if (typeof markerGroup.markerObjs != "undefined") {
                             jQuery.each(markerGroup.markerObjs, function(j, markerObj) {
                                 markerObj.setVisible(false);
                             });
@@ -402,6 +404,14 @@ overviewer.views.SignControlView = Backbone.View.extend({
                     });
                 }
             });
+
+            for (i in dataRoot) {
+                var group = dataRoot[i];
+
+                if (group.displayName == 'Labels') {
+                    overviewer.labelGroup = group;
+                }
+            }
 
             return;
 
@@ -472,7 +482,6 @@ overviewer.views.SignControlView = Backbone.View.extend({
             var group = dataRoot[i];
 
             if (group.displayName == 'Labels') {
-              overviewer.labelGroup = group;
               this.addItem({group: group, action:function(this_item, checked) {
                   this_item.group.checked = checked;
                   overviewer.signs.updateLabels();
@@ -598,11 +607,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
 
       jQuery.each(overviewer.labelGroup.markerObjs, function(i, infoBoxObj) {
         var lMaxZoomMatch = infoBoxObj.getContent().match(/<!--(\d+)-->/);
-        if (document.getElementById('chkMarkersLabels').checked && (lMaxZoomMatch == null || zoom <= lMaxZoomMatch[1])) {
-          infoBoxObj.show();
-        } else {
-          infoBoxObj.hide();
-        }
+        infoBoxObj.setVisible(document.getElementById('chkMarkersLabels').checked && (lMaxZoomMatch == null || zoom <= lMaxZoomMatch[1]));
       });
     },
 });
