@@ -394,7 +394,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
             jQuery.each(markers, function(key, markerSet) {
                 if (key != curMarkerSet) {
                     jQuery.each(markerSet, function(i, markerGroup) {
-                        if (typeof markerGroup.markerObjs != "undefined") {
+                        if (markerGroup.displayName != 'Labels' && typeof markerGroup.markerObjs != "undefined") {
                             jQuery.each(markerGroup.markerObjs, function(j, markerObj) {
                                 markerObj.setVisible(false);
                             });
