@@ -6,7 +6,7 @@ outputdir = '/var/www/minecraft/map'
 base = 'http://tiles.iprefermuffins.com:8042/minecraft/map/'
 
 filters = [
-	dict(name = 'Labels',  filterFunction = markerfilters.labelsign),
+	dict(name = 'Labels',  filterFunction = markerfilters.labelsign, checked = True),
 	dict(name = 'Signs',   filterFunction = markerfilters.normalsign),
 	dict(name = 'Players', filterFunction = markerfilters.playericons)]
 
