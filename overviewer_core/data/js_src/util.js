@@ -68,8 +68,8 @@ overviewer.util = {
         progressdiv.updateProgress();
 
         if (overviewer.collections.haveSigns) {
-            overviewer.signs = new overviewer.views.SignControlView();
-            overviewer.signs.registerEvents(overviewer.signs);
+            var signs = new overviewer.views.SignControlView();
+            signs.registerEvents(signs);
         }
 
         var overlayControl = new overviewer.views.OverlayControlView();

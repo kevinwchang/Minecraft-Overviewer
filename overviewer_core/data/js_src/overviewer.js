@@ -41,7 +41,9 @@ overviewer.collections = {
         /**
          * holds a reference to the spawn marker. 
          */
-        'spawnMarker': null
+        'spawnMarker': null,
+
+        'labelGroup': null
     };
 
 overviewer.classes = {
@@ -103,7 +105,3 @@ overviewer.gmap = {
             };
         }
 };
-
-overviewer.signs = null;
-overviewer.labelGroup = '';
-overviewer.labelLoadListener = null;

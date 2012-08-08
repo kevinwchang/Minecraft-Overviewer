@@ -137,7 +137,7 @@ overviewer.views.CoordboxView = Backbone.View.extend({
     }
 });
 
-overviewer.views.ProgressView = Backbone.View.extend({  
+overviewer.views.ProgressView = Backbone.View.extend({	
     initialize: function() {
         this.el.id = 'progressDiv';
         this.el.innerHTML = 'Current Render Progress';
@@ -374,8 +374,11 @@ overviewer.views.SignControlView = Backbone.View.extend({
     initialize: function(opts) {
         $(this.el).addClass("customControl");
         overviewer.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this.el);
+
         InfoBox.prototype.setVisible = function(visible) {
-            visible ? this.show() : this.hide();
+            var zoom = overviewer.mapView.options.currentTileSet.get('maxZoom') - overviewer.map.getZoom();
+            var lMaxZoomMatch = this.getContent().match(/<!--(\d+)-->/);
+            visible && (lMaxZoomMatch == null || zoom <= lMaxZoomMatch[1]) ? this.show() : this.hide();
         };
     },
     registerEvents: function(me) {
@@ -409,7 +412,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
                 var group = dataRoot[i];
 
                 if (group.displayName == 'Labels') {
-                    overviewer.labelGroup = group;
+                    overviewer.collections.labelGroup = group;
                 }
             }
 
@@ -418,13 +421,14 @@ overviewer.views.SignControlView = Backbone.View.extend({
         });
 
         google.maps.event.addListener(overviewer.map, 'zoom_changed', function() {
-          overviewer.signs.updateLabels();
+            if (overviewer.collections.labelGroup == null)
+                return;
+
+            jQuery.each(overviewer.collections.labelGroup.markerObjs, function(i, markerObj) {
+                markerObj.setVisible(overviewer.collections.labelGroup.checked);
+            });
         });
 
-        overviewer.labelLoadListener = google.maps.event.addListener(overviewer.map, 'idle', function() {
-          google.maps.event.removeListener(overviewer.labelLoadListener);
-          overviewer.signs.updateLabels();
-        });
     },
     /**
      * SignControlView::render
@@ -472,17 +476,17 @@ overviewer.views.SignControlView = Backbone.View.extend({
                     var entity = markersDB[groupName].raw[j];
 
                     if(dataRoot[i].displayName == 'Labels') {
-                      var text = jQuery.trim(entity.text);
-                      var lMaxZoomMatch = text.match(/^\s*#+0*(\d+)/);
-                      var labelContent = text.replace(/(^\s*#+\d*\s*)|(\s*#+\s*$)/g, '').replace(/\n/g,'<br/>');
-                      var labelClass = 'mapLabel';
+                        var text = jQuery.trim(entity.text);
+                        var lMaxZoomMatch = text.match(/^\s*#+0*(\d+)/);
+                        var labelContent = text.replace(/(^\s*#+\d*\s*)|(\s*#+\s*$)/g, '').replace(/\n/g,'<br/>');
+                        var labelClass = 'mapLabel';
 
-                      if (lMaxZoomMatch != null) {
-                        labelContent = '<!--' + lMaxZoomMatch[1] + '-->' + labelContent;
-                        labelClass += ' lMaxZoom' + lMaxZoomMatch[1];
-                      }
+                        if (lMaxZoomMatch != null) {
+                            labelContent = '<!--' + lMaxZoomMatch[1] + '-->' + labelContent;
+                            labelClass += ' lMaxZoom' + lMaxZoomMatch[1];
+                        }
 
-                      var infobox = new InfoBox({
+                        var infobox = new InfoBox({
                               'position': overviewer.util.fromWorldToLatLng(entity.x,
                                   entity.y, entity.z, overviewer.mapView.options.currentTileSet),
                               'content':  labelContent,
@@ -493,9 +497,9 @@ overviewer.views.SignControlView = Backbone.View.extend({
                               'disableAutoPan': true,
                               'maxWidth': 0,
                               'isHidden':   true
-                      });
-                      infobox.open(overviewer.map);
-                      dataRoot[i].markerObjs.push(infobox);
+                        });
+                        infobox.open(overviewer.map);
+                        dataRoot[i].markerObjs.push(infobox);
                     } else {
                       if (entity['icon']) {
                           iconURL = entity['icon'];
@@ -546,7 +550,6 @@ overviewer.views.SignControlView = Backbone.View.extend({
         var itemDiv = document.createElement('div');
         var itemInput = document.createElement('input');
         itemInput.type='checkbox';
-        itemInput.id = 'chkMarkers' + item.group.displayName;
 
         if (item.group.checked) {
             itemInput.checked="true";
@@ -574,17 +577,6 @@ overviewer.views.SignControlView = Backbone.View.extend({
         itemDiv.appendChild(textNode);
         itemDiv.style.whiteSpace = "nowrap";
 
-    },
-    updateLabels: function() {
-      if (overviewer.labelGroup == null || document.getElementById('chkMarkersLabels') == null)
-        return;
-
-      zoom = overviewer.mapView.options.currentTileSet.get('maxZoom') - overviewer.map.getZoom();
-
-      jQuery.each(overviewer.labelGroup.markerObjs, function(i, infoBoxObj) {
-        var lMaxZoomMatch = infoBoxObj.getContent().match(/<!--(\d+)-->/);
-        infoBoxObj.setVisible(document.getElementById('chkMarkersLabels').checked && (lMaxZoomMatch == null || zoom <= lMaxZoomMatch[1]));
-      });
     },
 });
 
