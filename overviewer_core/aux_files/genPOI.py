@@ -24,6 +24,13 @@ from overviewer_core import logger
 from overviewer_core import nbt
 from overviewer_core import configParser, world
 
+def replaceBads(s):
+    "Replaces bad characters with good characters!"
+    bads = [" ", "(", ")"]
+    x=s
+    for bad in bads:
+        x = x.replace(bad,"_")
+    return x
 
 def handleSigns(rset, outputdir, render, rname):
 
@@ -57,7 +64,9 @@ def handlePlayers(rset, render, worldpath):
     playerdir = os.path.join(worldpath, "players")
     if os.path.isdir(playerdir):
         playerfiles = os.listdir(playerdir)
+        playerfiles = [x for x in playerfiles if x.endswith(".dat")]
         isSinglePlayer = False
+
     else:
         playerfiles = [os.path.join(worldpath, "level.dat")]
         isSinglePlayer = True
@@ -156,7 +165,7 @@ def main():
       
         for f in render['markers']:
             markersets.add(((f['name'], f['filterFunction']), rset))
-            name = f['name'].replace(" ","_") + hex(hash(f['filterFunction']))[-4:] + "_" + hex(hash(rset))[-4:]
+            name = replaceBads(f['name']) + hex(hash(f['filterFunction']))[-4:] + "_" + hex(hash(rset))[-4:]
             to_append = dict(groupName=name, 
                     displayName = f['name'], 
                     icon=f.get('icon', 'signpost_icon.png'), 
@@ -179,7 +188,7 @@ def main():
         filter_name =     flter[0]
         filter_function = flter[1]
 
-        name = filter_name.replace(" ","_") + hex(hash(filter_function))[-4:] + "_" + hex(hash(rset))[-4:]
+        name = replaceBads(filter_name) + hex(hash(filter_function))[-4:] + "_" + hex(hash(rset))[-4:]
         markerSetDict[name] = dict(created=False, raw=[], name=filter_name)
         for poi in rset._pois['TileEntities']:
             result = filter_function(poi)
