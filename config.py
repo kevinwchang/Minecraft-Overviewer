@@ -5,14 +5,16 @@ worlds['world'] = 'world'
 outputdir = '/var/www/minecraft/map'
 base = 'http://tiles.iprefermuffins.com:8042/minecraft/map/'
 
+imgformat = 'jpg'
+imgquality = 50
+processes = 3
+
+end_rendermode = [Base(), EdgeLines(), SmoothLighting(strength=0.8)]
+
 filters = [
 	dict(name = 'Labels',  filterFunction = markerfilters.labelsign, checked = True),
 	dict(name = 'Signs',   filterFunction = markerfilters.normalsign),
 	dict(name = 'Players', filterFunction = markerfilters.playericons)]
-
-imgformat = 'jpg'
-imgquality = 50
-processes = 3
 
 renders['day'] = {
 	'world': 'world',
