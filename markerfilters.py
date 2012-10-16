@@ -11,6 +11,12 @@ label_re = re.compile('^\s*#')
 def islabelsign(poi):
 	return label_re.search(fulltext(poi)) is not None
 
+bot_re = re.compile('bot$', re.I)
+cam_re = re.compile('cam$', re.I)
+
+def isrealplayer(poi):
+	return bot_re.search(poi['EntityId']) is None and cam_re.search(poi['EntityId']) is None
+
 # filters
 
 def labelsign(poi):
@@ -22,6 +28,6 @@ def normalsign(poi):
 		return fulltext(poi)
 
 def playericons(poi):
-	if poi['id'] == 'Player':
+	if poi['id'] == 'Player' and isrealplayer(poi):
 		poi['icon'] = "http://overviewer.org/avatar/%s" % poi['EntityId']
 		return 'Last known location for {0}\n{1}'.format(poi['EntityId'], time.strftime('%A, %B %d, %Y\n%H:%M:%S %Z', time.localtime(poi['mtime'])))

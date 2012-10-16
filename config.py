@@ -10,6 +10,10 @@ filters = [
 	dict(name = 'Signs',   filterFunction = markerfilters.normalsign),
 	dict(name = 'Players', filterFunction = markerfilters.playericons)]
 
+imgformat = 'jpg'
+imgquality = 50
+processes = 3
+
 renders['day'] = {
 	'world': 'world',
 	'title': 'Day',
@@ -30,6 +34,12 @@ renders['night'] = {
 	'poititle': 'Markers'
 }
 
-imgformat = 'jpg'
-imgquality = 50
-processes = 3
+renders['end'] = {
+	'world': 'world',
+	'title': 'End',
+	'rendermode': end_rendermode,
+	'dimension': 'end',
+	'northdirection': 'upper-right',
+	'markers': filters,
+	'poititle': 'Markers'
+}
