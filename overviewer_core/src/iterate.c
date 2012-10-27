@@ -208,7 +208,7 @@ unload_all_chunks(RenderState *state) {
 }
 
 unsigned char
-check_adjacent_blocks(RenderState *state, int x,int y,int z, unsigned char blockid) {
+check_adjacent_blocks(RenderState *state, int x,int y,int z, unsigned short blockid) {
     /*
      * Generates a pseudo ancillary data for blocks that depend of 
      * what are surrounded and don't have ancillary data. This 
@@ -395,6 +395,13 @@ generate_pseudo_data(RenderState *state, unsigned char ancilData) {
         
         }
         return data;
+    } else if (state->block == 139) { /* cobblestone and mossy cobbleston wall  */
+        /* check for walls and add one bit with the type of wall (mossy or cobblestone)*/
+        if (ancilData == 0x1) {
+            return check_adjacent_blocks(state, x, y, z, state->block) | 0x10;
+        } else {
+            return check_adjacent_blocks(state, x, y, z, state->block);
+        }
     }
 
 
@@ -542,7 +549,7 @@ chunk_render(PyObject *self, PyObject *args) {
                         (state.block == 71) || (state.block == 79) ||
                         (state.block == 85) || (state.block == 90) ||
                         (state.block == 101) || (state.block == 102) ||
-                        (state.block == 113)) {
+                        (state.block == 113) || (state.block == 139)) {
                         ancilData = generate_pseudo_data(&state, ancilData);
                         state.block_pdata = ancilData;
                     } else {
