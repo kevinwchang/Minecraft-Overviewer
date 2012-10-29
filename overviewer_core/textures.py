@@ -3594,7 +3594,7 @@ def cocoa_plant(self, blockid, data):
     return img
 
 # command block
-block(blockid=137, top_index=136)
+block(blockid=137, top_index=184)
 
 # beacon block
 # at the moment of writing this, it seems the beacon block doens't use
@@ -3675,14 +3675,14 @@ def cobblestone_wall(self, blockid, data):
 
     # Create the sides of the wall
     wall_small_side = self.transform_image_side(wall_small_side)
-    fence_small_other_side = wall_small_side.transpose(Image.FLIP_LEFT_RIGHT)
+    wall_small_other_side = wall_small_side.transpose(Image.FLIP_LEFT_RIGHT)
     
     # Darken the sides slightly. These methods also affect the alpha layer,
     # so save them first (we don't want to "darken" the alpha layer making
     # the block transparent)
-    sidealpha = fence_small_other_side.split()[3]
-    fence_small_other_side = ImageEnhance.Brightness(fence_small_other_side).enhance(0.9)
-    fence_small_other_side.putalpha(sidealpha)
+    sidealpha = wall_small_other_side.split()[3]
+    wall_small_other_side = ImageEnhance.Brightness(wall_small_other_side).enhance(0.9)
+    wall_small_other_side.putalpha(sidealpha)
     sidealpha = wall_small_side.split()[3]
     wall_small_side = ImageEnhance.Brightness(wall_small_side).enhance(0.9)
     wall_small_side.putalpha(sidealpha)
@@ -3704,12 +3704,18 @@ def cobblestone_wall(self, blockid, data):
     if (data & 0b0001) == 1:
         alpha_over(img,wall_small_side, pos_top_left,wall_small_side)                # top left
     if (data & 0b1000) == 8:
-        alpha_over(img,fence_small_other_side, pos_top_right,fence_small_other_side)    # top right
-        
-    alpha_over(img,fence_big,(0,0),fence_big)
+        alpha_over(img,wall_small_other_side, pos_top_right,wall_small_other_side)    # top right
+    
+    # don't draw the big stick unless there's a corner
+    if (data == 0b1010) or (data == 0b11010):
+        alpha_over(img, wall_small_other_side, (10-4,3+2), wall_small_other_side)
+    elif (data == 0b0101) or (data == 0b10101):
+        alpha_over(img, wall_small_side, (2+4,3+2), wall_small_side)
+    else:
+        alpha_over(img,fence_big,(0,0),fence_big)
         
     if (data & 0b0010) == 2:
-        alpha_over(img,fence_small_other_side, pos_bottom_left,fence_small_other_side)      # bottom left    
+        alpha_over(img,wall_small_other_side, pos_bottom_left,wall_small_other_side)      # bottom left    
     if (data & 0b0100) == 4:
         alpha_over(img,wall_small_side, pos_bottom_right,wall_small_side)                  # bottom right
     
@@ -3734,4 +3740,80 @@ def crops(self, blockid, data):
     alpha_over(img, crop1, (0,12), crop1)
     alpha_over(img, crop2, (6,3), crop2)
     alpha_over(img, crop3, (6,3), crop3)
+    return img
+
+# anvils
+@material(blockid=145, data=range(12), transparent=True)
+def anvil(self, blockid, data):
+    # get the correct textures
+    # the bits 0x4 and 0x8 determine how damaged is the anvil
+    if (data & 0xc) == 0: # non damaged anvil
+        top = self.terrain_images[231]
+    elif (data & 0xc) == 0x4: # slightly damaged
+        top = self.terrain_images[232]
+    elif (data & 0xc) == 0x8: # very damaged
+        top = self.terrain_images[216]
+    # everything else use this texture
+    big_side = self.terrain_images[215].copy()
+    small_side = self.terrain_images[215].copy()
+    base = self.terrain_images[215].copy()
+    small_base = self.terrain_images[215].copy()
+    
+    # cut needed patterns
+    ImageDraw.Draw(big_side).rectangle((0,8,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
+    ImageDraw.Draw(small_side).rectangle((0,0,2,15),outline=(0,0,0,0),fill=(0,0,0,0))
+    ImageDraw.Draw(small_side).rectangle((13,0,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
+    ImageDraw.Draw(small_side).rectangle((0,8,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
+    ImageDraw.Draw(base).rectangle((0,0,15,15),outline=(0,0,0,0))
+    ImageDraw.Draw(base).rectangle((1,1,14,14),outline=(0,0,0,0))
+    ImageDraw.Draw(small_base).rectangle((0,0,15,15),outline=(0,0,0,0))
+    ImageDraw.Draw(small_base).rectangle((1,1,14,14),outline=(0,0,0,0))
+    ImageDraw.Draw(small_base).rectangle((2,2,13,13),outline=(0,0,0,0))
+    ImageDraw.Draw(small_base).rectangle((3,3,12,12),outline=(0,0,0,0))
+    
+    # check orientation and compose the anvil
+    if data & 0x1 == 1: # west-east
+        top = top.rotate(90)
+        left_side = small_side
+        left_pos = (1,7)
+        right_side = big_side
+        right_pos = (10,5)
+    else: # north-south
+        right_side = small_side
+        right_pos = (12,7)
+        left_side = big_side
+        left_pos = (3,5)
+    
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+    
+    # darken sides
+    alpha = big_side.split()[3]
+    big_side = ImageEnhance.Brightness(big_side).enhance(0.8)
+    big_side.putalpha(alpha)
+    alpha = small_side.split()[3]
+    small_side = ImageEnhance.Brightness(small_side).enhance(0.9)
+    small_side.putalpha(alpha)
+    alpha = base.split()[3]
+    base_d = ImageEnhance.Brightness(base).enhance(0.8)
+    base_d.putalpha(alpha)
+    
+    # compose
+    base = self.transform_image_top(base)
+    base_d = self.transform_image_top(base_d)
+    small_base = self.transform_image_top(small_base)
+    top = self.transform_image_top(top)
+    
+    alpha_over(img, base_d, (0,12), base_d)
+    alpha_over(img, base_d, (0,11), base_d)
+    alpha_over(img, base_d, (0,10), base_d)
+    alpha_over(img, small_base, (0,10), small_base)
+    
+    alpha_over(img, top, (0,0), top)
+    
+    left_side = self.transform_image_side(left_side)
+    right_side = self.transform_image_side(right_side).transpose(Image.FLIP_LEFT_RIGHT)
+    
+    alpha_over(img, left_side, left_pos, left_side)
+    alpha_over(img, right_side, right_pos, right_side)
+    
     return img
