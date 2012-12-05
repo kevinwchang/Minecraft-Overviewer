@@ -43,6 +43,11 @@ overviewer.collections = {
          */
         'spawnMarker': null,
 
+        /**
+         * if a user visits a specific URL, this marker will point to the coordinates in the hash
+         */
+        'locationMarker': null,
+
         'labelGroup': null
     };
 
