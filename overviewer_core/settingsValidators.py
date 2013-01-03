@@ -227,6 +227,12 @@ def validatePath(p):
     if not os.path.exists(abs_path):
         raise ValidationException("'%s' does not exist. Path initially given as '%s'" % (abs_path,p))
 
+def validateManualPOIs(d):
+    for poi in d:
+        if not 'x' in poi or not 'y' in poi or not 'z' in poi or not 'id' in poi:
+            raise ValidationException("Not all POIs have x/y/z coordinates or an id: %r" % poi)
+    return d
+
 def make_dictValidator(keyvalidator, valuevalidator):
     """Compose and return a dict validator -- a validator that validates each
     key and value in a dictionary.

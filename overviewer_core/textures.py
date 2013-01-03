@@ -29,6 +29,11 @@ import functools
 import util
 from c_overviewer import alpha_over
 
+class TextureException(Exception):
+    "To be thrown when a texture is not found."
+    pass
+
+
 ##
 ## Textures object
 ##
@@ -213,7 +218,7 @@ class Textures(object):
                 if verbose: logging.info("Found %s in '%s'", filename, path)
                 return open(path, mode)
 
-        raise IOError("Could not find the file `{0}'. Try specifying the 'texturepath' option in your config file. Set it to the directory where I can find {0}. Also see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>".format(filename))
+        raise TextureException("Could not find the file `{0}'. Try specifying the 'texturepath' option in your config file. Set it to the directory where I can find {0}. Also see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>".format(filename))
 
     def load_image(self, filename):
         """Returns an image object"""
@@ -231,7 +236,7 @@ class Textures(object):
             # try the MCPatcher case first
             watertexture = self.load_image("custom_water_still.png")
             watertexture = watertexture.crop((0, 0, watertexture.size[0], watertexture.size[0]))
-        except IOError:
+        except TextureException:
             watertexture = self.load_image("water.png")
         self.watertexture = watertexture
         return watertexture
@@ -246,7 +251,7 @@ class Textures(object):
             # try the MCPatcher lava first, in case it's present
             lavatexture = self.load_image("custom_lava_still.png")
             lavatexture = lavatexture.crop((0, 0, lavatexture.size[0], lavatexture.size[0]))
-        except IOError:
+        except TextureException:
             lavatexture = self.load_image("lava.png")
         self.lavatexture = lavatexture
         return lavatexture
@@ -264,7 +269,7 @@ class Textures(object):
             firetextureEW = self.load_image("custom_fire_e_w.png")
             firetextureEW = firetextureEW.crop((0, 0, firetextureEW.size[0], firetextureEW.size[0]))
             firetexture = (firetextureNS,firetextureEW)
-        except IOError:
+        except TextureException:
             fire = self.load_image("fire.png")
             firetexture = (fire, fire)
         self.firetexture = firetexture
@@ -280,7 +285,7 @@ class Textures(object):
             # try the MCPatcher case first
             portaltexture = self.load_image("custom_portal.png")
             portaltexture = portaltexture.crop((0, 0, portaltexture.size[0], portaltexture.size[1]))
-        except IOError:
+        except TextureException:
             portaltexture = self.load_image("portal.png")
         self.portaltexture = portaltexture
         return portaltexture
