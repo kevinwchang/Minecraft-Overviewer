@@ -9,7 +9,8 @@ imgformat = 'jpg'
 imgquality = 50
 processes = 3
 
-end_rendermode = [Base(), EdgeLines(), SmoothLighting(strength=0.8)]
+end_ambient_smooth_lighting = [Base(), EdgeLines(), SmoothLighting(strength=0.8)]
+nether_ambient_smooth_lighting = [Base(), EdgeLines(), Nether(), SmoothLighting(strength=0.8)]
 
 filters = [
 	dict(name = 'Labels',  filterFunction = markerfilters.labelsign, checked = True),
@@ -39,8 +40,18 @@ renders['night'] = {
 renders['end'] = {
 	'world': 'world',
 	'title': 'End',
-	'rendermode': end_rendermode,
+	'rendermode': end_ambient_smooth_lighting,
 	'dimension': 'end',
+	'northdirection': 'upper-right',
+	'markers': filters,
+	'poititle': 'Markers'
+}
+
+renders['nether'] = {
+	'world': 'world',
+	'title': 'Nether',
+	'rendermode': nether_ambient_smooth_lighting,
+	'dimension': 'nether',
 	'northdirection': 'upper-right',
 	'markers': filters,
 	'poititle': 'Markers'
