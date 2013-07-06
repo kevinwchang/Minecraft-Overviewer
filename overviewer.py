@@ -80,7 +80,7 @@ def main():
 
     # Useful one-time debugging options:
     parser.add_option("--check-terrain", dest="check_terrain", action="store_true",
-            help="Prints the location and hash of terrain.png, useful for debugging terrain.png problems")
+            help="Tries to locate the texture files. Useful for debugging texture problems.")
     parser.add_option("-V", "--version", dest="version",
             help="Displays version information and then exits", action="store_true")
     parser.add_option("--update-web-assets", dest='update_web_assets', action="store_true",
@@ -148,12 +148,12 @@ def main():
 
         logging.info("Looking for a few common texture files...")
         try:
-            f = tex.find_file("textures/blocks/stone.png", verbose=True)
-            f = tex.find_file("textures/blocks/tallgrass.png", verbose=True)
-            f = tex.find_file("textures/blocks/oreDiamond.png", verbose=True)
-            f = tex.find_file("textures/blocks/wood.png", verbose=True)
+            f = tex.find_file("assets/minecraft/textures/blocks/sandstone_top.png", verbose=True)
+            f = tex.find_file("assets/minecraft/textures/blocks/grass_top.png", verbose=True)
+            f = tex.find_file("assets/minecraft/textures/blocks/diamond_ore.png", verbose=True)
+            f = tex.find_file("assets/minecraft/textures/blocks/planks_oak.png", verbose=True)
         except IOError:
-            logging.error("Could not find the file stone.png")
+            logging.error("Could not find any texture files.")
             return 1
 
         return 0

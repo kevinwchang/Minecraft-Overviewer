@@ -229,8 +229,19 @@ is typically correct.
 Installing the Textures
 =======================
 
+.. note::
+    This procedure has changed with Minecraft 1.6's Resource Pack update. The
+    latest versions of Overviewer are not compatible with Minecraft 1.5 client
+    resources.
+
 If Overviewer is running on a machine with the Minecraft client installed, it
 will automatically use the default textures from Minecraft.
+    
+.. note::
+    Overviewer will only search for installed client *release* versions, not
+    snapshots. If you want to use a snapshot client jar for the textures,
+    you must specify it manually with the :ref:`texturepath<option_texturepath>`
+    option.
 
 If, however, you're running on a machine without the Minecraft client installed,
 or if you want to use different textures, you will need to provide the textures
@@ -238,19 +249,31 @@ manually. This is common for servers.
 
 If you want or need to provide your own textures, you have several options:
 
-* If you're running the Overviewer on a server, you can still put the
-  minecraft.jar file (not the launcher) into the correct location and the
-  Overviewer will find and use it, thinking the client is installed, even if the
-  rest of the client files are missing. On Linux, try a command like this::
+* The easy solution is to download the latest client jar to the place the
+  launcher would normally put it. Overviewer will find it and use it.
 
-      wget -N http://s3.amazonaws.com/MinecraftDownload/minecraft.jar -P ~/.minecraft/bin/
+  You can use the following commands to download the client jar on Linux or Mac.
+  Adjust the version to the latest since these docs may not always reflect the
+  latest Minecraft version.
 
-* You can manually extract the textures folder from minecraft.jar or your favorite
-  texture pack. If you've built the Overviewer from source or are using the
-  windows exe, place the folder in the same directory as overviewer.py or
-  overviewer.exe.
+  ::
 
-* Specify any texture pack you want with the
+    VERSION=1.6.1
+    wget https://s3.amazonaws.com/Minecraft.Download/versions/$VERSION/${VERSION}.jar -P ~/.minecraft/versions/$VERSION/
+
+* You can also just run the launcher to install the client.
+  
+* You can transfer the client jar to the correct place manually, from a computer
+  that does have the client, to your server. The correct places are:
+  
+  * For Linux: ``~/.minecraft/versions/<version>/<version>.jar``
+
+  * For Mac: ``~/Library/Application Support/minecraft/versions/<version>/<version>.jar``
+    
+  * For Windows: ``%APPDATA%/.minecraft/versions/<version>/<version>.jar``
+
+* You can download and use a custom resource pack. Download the resource pack
+  file and specify the path to it with the
   :ref:`texturepath<option_texturepath>` option.
 
 If you copy your world before you render it
