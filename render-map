@@ -1,6 +1,7 @@
 #!/bin/bash
 cd "$( dirname "$0" )"
-wget -N http://s3.amazonaws.com/MinecraftDownload/minecraft.jar -P ~/.minecraft/bin/
+VERSION=1.6.2
+wget -N https://s3.amazonaws.com/Minecraft.Download/versions/$VERSION/${VERSION}.jar -P ~/.minecraft/versions/$VERSION/
 rsync -a --delete ../world .
 python overviewer.py --config config.py
 python overviewer.py --config config.py --genpoi
