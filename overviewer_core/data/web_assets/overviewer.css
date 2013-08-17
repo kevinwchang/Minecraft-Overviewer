@@ -178,7 +178,7 @@ div.mapLabel {
     width: 256px;
 }
 
-.lMaxZoom1, .lMaxZoom0 {
+div.lMaxZoom1, div.lMaxZoom0 {
     font-size: 16px;
 }
 
