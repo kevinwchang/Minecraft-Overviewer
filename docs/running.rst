@@ -249,17 +249,24 @@ manually. This is common for servers.
 
 If you want or need to provide your own textures, you have several options:
 
-* The easy solution is to download the latest client jar to the place the
-  launcher would normally put it. Overviewer will find it and use it.
+* The easy solution is to download the latest client jar to the location the
+  launcher would normally install it. Overviewer will find it and use it.
 
   You can use the following commands to download the client jar on Linux or Mac.
-  Adjust the version to the latest since these docs may not always reflect the
-  latest Minecraft version.
+  Run the first line in a terminal, changing the version string to the latest as appropriate
+  (these docs may not always be updated to reflect the latest). Then paste the second line
+  into your terminal to download the latest version. ``${VERSION}`` will be replaced
+  by the acutal version string from the first line.
 
   ::
 
-    VERSION=1.6.1
-    wget https://s3.amazonaws.com/Minecraft.Download/versions/$VERSION/${VERSION}.jar -P ~/.minecraft/versions/$VERSION/
+    VERSION=1.6.2
+    wget https://s3.amazonaws.com/Minecraft.Download/versions/${VERSION}/${VERSION}.jar -P ~/.minecraft/versions/${VERSION}/
+    
+  If that's too confusing for you, then just take this single line and paste it into
+  a terminal to get 1.6.2 textures::
+  
+    wget https://s3.amazonaws.com/Minecraft.Download/versions/1.6.2/1.6.2.jar -P ~/.minecraft/versions/1.6.2/
 
 * You can also just run the launcher to install the client.
   
