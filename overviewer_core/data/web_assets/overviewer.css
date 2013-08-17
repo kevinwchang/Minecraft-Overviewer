@@ -156,7 +156,7 @@ div.searchResultItem img {
     src: url('GazelleFLF.ttf');
 } 
 
-.mapLabel {
+div.mapLabel {
     text-align: center;
     font-family: 'label-font';
     font-size: 24px;
