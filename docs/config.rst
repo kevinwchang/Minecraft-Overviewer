@@ -295,6 +295,7 @@ the form ``key = value``. Two items take a different form:, ``worlds`` and
             Path to overviewer output directory. For simplicity, specify this 
             as ``outputdir=outputdir`` and place this line after setting
             ``outputdir = "<output directory path>"``.
+            
             **Required**
         
         * ``minrefresh=<seconds>``
@@ -316,14 +317,55 @@ the form ``key = value``. Two items take a different form:, ``worlds`` and
             * ``renderProgress="Rendered %d of %d tiles (%d%% ETA:%s)""``
               The four format strings will be replaced with the number of tiles
               completed, the total number of tiles, the percentage complete, and the ETA.
+	
 
             Format strings are explained here: http://docs.python.org/library/stdtypes.html#string-formatting
             All format strings must be present in your custom messages.
 
         ::
 
-                from observer import JSObserver
-                observer = JSObserver(outputdir, 10)
+            from observer import JSObserver
+            observer = JSObserver(outputdir, 10)
+                
+		
+    ``MultiplexingObserver(Observer[, Observer[, Observer ...]])``
+        This observer will send the progress information to all Observers passed
+        to it.
+        
+        * All Observers passed must implement the full Observer interface.
+        
+        ::
+        
+            ## An example that updates both a LoggingObserver and a JSObserver
+            # Import the Observers
+            from Observer import MultiplexingObserver, LoggingObserver, JSObserver
+            
+            # Construct the LoggingObserver
+            loggingObserver = LoggingObserver()
+            
+            # Construct a basic JSObserver
+            jsObserver = JSObserver(outputdir) # This assumes you have set the outputdir previous to this line
+            
+            # Set the observer to a MultiplexingObserver 
+            observer = MultiplexingObserver(loggingObserver, jsObserver)
+            
+    ``ServerAnnounceObserver(target, pct_interval)``
+        This Observer will send its progress and status to a Minecraft server
+        via ``target`` with a Minecraft ``say`` command.
+        
+        * ``target=<file handle to write to>``
+            Either a FIFO file or stdin. Progress and status messages will be written to this handle.
+            
+            **Required**
+        
+        * ``pct_interval=<update rate, in percent>``
+            Progress and status messages will not be written more often than this value.
+            E.g., a value of ``1`` will make the ServerAnnounceObserver write to its target
+            once for every 1% of progress.
+            
+            **Required**
+            
+            
 
 
 .. _customwebassets:
@@ -539,6 +581,18 @@ values. The valid configuration keys are listed below.
             usage is an issue.
 
     **Default:** Automatically set to most detailed zoom level
+
+``minzoom``
+    This specifies the minimum zoom allowed by the zoom control on the web page.  For
+    example, setting this to 2 will disable the two most-zoomed out levels.
+
+    .. note::
+
+            This does not change the number of zoom levels rendered, but allows
+            you to have control over the number of zoom levels accessible via the
+            slider control.
+
+    **Default:** 0 (zero, which does not disable any zoom levels)
 
 ``showlocationmarker``
     Allows you to specify whether to show the location marker when accessing a URL

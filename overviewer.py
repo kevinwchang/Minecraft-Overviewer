@@ -66,6 +66,7 @@ def main():
     parser.add_option("-p", "--processes", dest="procs", action="store", type="int",
             help="The number of local worker processes to spawn. Defaults to the number of CPU cores your computer has")
 
+    parser.add_option("--pid", dest="pid", action="store", help="Specify the pid file to use.")
     # Options that only apply to the config-less render usage
     parser.add_option("--rendermodes", dest="rendermodes", action="store",
             help="If you're not using a config file, specify which rendermodes to render with this option. This is a comma-separated list.")
@@ -134,10 +135,26 @@ def main():
             print("built on %s" % overviewer_version.BUILD_DATE)
             if options.verbose > 0:
                 print("Build machine: %s %s" % (overviewer_version.BUILD_PLATFORM, overviewer_version.BUILD_OS))
+                print("Read version information from %r"% overviewer_version.__file__)
         except ImportError:
             print("(build info not found)")
+        if options.verbose > 0:
+            print("Python executable: %r" % sys.executable)
+            print(sys.version)
         return 0
 
+    if options.pid:
+        if os.path.exists(options.pid):
+            try:
+                with open(options.pid, 'r') as fpid:
+                    pid = int(fpid.read())
+                    if util.pid_exists(pid):
+                        print("Already running (pid exists) - exiting..")
+                        return 0
+            except (IOError, ValueError):
+                pass
+        with open(options.pid,"w") as f:
+            f.write(str(os.getpid()))
     # if --check-terrain was specified, but we have NO config file, then we cannot
     # operate on a custom texture path.  we do terrain checking with a custom texture
     # pack later on, after we've parsed the config file
@@ -151,7 +168,7 @@ def main():
             f = tex.find_file("assets/minecraft/textures/blocks/sandstone_top.png", verbose=True)
             f = tex.find_file("assets/minecraft/textures/blocks/grass_top.png", verbose=True)
             f = tex.find_file("assets/minecraft/textures/blocks/diamond_ore.png", verbose=True)
-            f = tex.find_file("assets/minecraft/textures/blocks/planks_oak.png", verbose=True)
+            f = tex.find_file("assets/minecraft/textures/blocks/planks_acacia.png", verbose=True)
         except IOError:
             logging.error("Could not find any texture files.")
             return 1
@@ -462,7 +479,7 @@ dir but you forgot to put quotes around the directory, since it contains spaces.
 
         # only pass to the TileSet the options it really cares about
         render['name'] = render_name # perhaps a hack. This is stored here for the asset manager
-        tileSetOpts = util.dict_subset(render, ["name", "imgformat", "renderchecks", "rerenderprob", "bgcolor", "defaultzoom", "imgquality", "optimizeimg", "rendermode", "worldname_orig", "title", "dimension", "changelist", "showspawn", "overlay", "base", "poititle", "maxzoom", "showlocationmarker"])
+        tileSetOpts = util.dict_subset(render, ["name", "imgformat", "renderchecks", "rerenderprob", "bgcolor", "defaultzoom", "imgquality", "optimizeimg", "rendermode", "worldname_orig", "title", "dimension", "changelist", "showspawn", "overlay", "base", "poititle", "maxzoom", "showlocationmarker", "minzoom"])
         tileSetOpts.update({"spawn": w.find_true_spawn()}) # TODO find a better way to do this
         tset = tileset.TileSet(w, rset, assetMrg, tex, tileSetOpts, tileset_dir)
         tilesets.append(tset)
@@ -493,6 +510,8 @@ dir but you forgot to put quotes around the directory, since it contains spaces.
         logging.debug("Final cache stats:")
         for c in caches:
             logging.debug("\t%s: %s hits, %s misses", c.__class__.__name__, c.hits, c.misses)
+    if options.pid:
+        os.remove(options.pid)
 
     return 0
 
