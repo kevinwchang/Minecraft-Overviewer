@@ -37,22 +37,22 @@ renders['night'] = {
 	'poititle': 'Markers'
 }
 
-renders['end'] = {
-	'world': 'world',
-	'title': 'End',
-	'rendermode': end_ambient_smooth_lighting,
-	'dimension': 'end',
-	'northdirection': 'upper-right',
-	'markers': filters,
-	'poititle': 'Markers'
-}
+#renders['end'] = {
+#	'world': 'world',
+#	'title': 'End',
+#	'rendermode': end_ambient_smooth_lighting,
+#	'dimension': 'end',
+#	'northdirection': 'upper-right',
+#	'markers': filters,
+#	'poititle': 'Markers'
+#}
 
-renders['nether'] = {
-	'world': 'world',
-	'title': 'Nether',
-	'rendermode': nether_ambient_smooth_lighting,
-	'dimension': 'nether',
-	'northdirection': 'upper-right',
-	'markers': filters,
-	'poititle': 'Markers'
-}
+#renders['nether'] = {
+#	'world': 'world',
+#	'title': 'Nether',
+#	'rendermode': nether_ambient_smooth_lighting,
+#	'dimension': 'nether',
+#	'northdirection': 'upper-right',
+#	'markers': filters,
+#	'poititle': 'Markers'
+#}
