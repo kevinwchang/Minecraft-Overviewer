@@ -15,6 +15,7 @@ markers.js holds a list of which markerSets are attached to each tileSet
 
 '''
 import os
+import time
 import logging
 import json
 import sys
@@ -22,6 +23,7 @@ import re
 import urllib2
 import Queue
 import multiprocessing
+import gzip
 
 from multiprocessing import Process
 from multiprocessing import Pool
@@ -117,24 +119,72 @@ def handleEntities(rset, outputdir, render, rname, config):
 
     logging.info("Done.")
 
-def handlePlayers(rset, render, worldpath):
+class PlayerDict(dict):
+    use_uuid = False
+    _name = ''
+    uuid_cache = None # A cache the UUID->profile lookups
+    
+    @classmethod
+    def load_cache(cls, outputdir):
+        cache_file = os.path.join(outputdir, "uuidcache.dat")
+        pid = multiprocessing.current_process().pid
+        if os.path.exists(cache_file):
+            gz = gzip.GzipFile(cache_file) 
+            cls.uuid_cache = json.load(gz)
+            logging.info("Loaded UUID cache from %r with %d entries", cache_file, len(cls.uuid_cache.keys()))
+        else:
+            cls.uuid_cache = {}
+            logging.info("Initialized an empty UUID cache")
+            cls.save_cache(outputdir)
+
+
+    @classmethod
+    def save_cache(cls, outputdir):
+        cache_file = os.path.join(outputdir, "uuidcache.dat")
+        gz = gzip.GzipFile(cache_file, "wb")
+        json.dump(cls.uuid_cache, gz)
+        logging.info("Wrote UUID cache with %d entries", len(cls.uuid_cache.keys()))
+    
+
+    def __getitem__(self, item):
+        if item == "EntityId":
+            if not super(PlayerDict, self).has_key("EntityId"):
+                if self.use_uuid:
+                    super(PlayerDict, self).__setitem__("EntityId", self.get_name_from_uuid())
+                else:
+                    super(PlayerDict, self).__setitem__("EntityId", self._name)
+        
+        return super(PlayerDict, self).__getitem__(item)
+
+    def get_name_from_uuid(self):
+        sname = self._name.replace('-','')
+        try:
+            profile = PlayerDict.uuid_cache[sname]
+            return profile['name']
+        except (KeyError,):
+            pass
+
+        try:
+            profile = json.loads(urllib2.urlopen(UUID_LOOKUP_URL + sname).read())
+            if 'name' in profile:
+                PlayerDict.uuid_cache[sname] = profile
+                return profile['name']
+        except (ValueError, urllib2.URLError):
+            logging.warning("Unable to get player name for UUID %s", self._name)
+
+def handlePlayers(rset, render, worldpath, outputdir):
     if not hasattr(rset, "_pois"):
         rset._pois = dict(TileEntities=[], Entities=[])
 
     # only handle this region set once
     if 'Players' in rset._pois:
         return
-    dimension = None
-    try:
-        dimension = {None: 0,
-                     'DIM-1': -1,
-                     'DIM1': 1}[rset.get_type()]
-    except KeyError, e:
-        mystdim = re.match(r"^DIM_MYST(\d+)$", e.message)  # Dirty hack. Woo!
-        if mystdim:
-            dimension = int(mystdim.group(1))
-        else:
-            raise
+
+    if rset.get_type():
+        dimension = int(re.match(r"^DIM(_MYST)?(-?\d+)$", rset.get_type()).group(2))
+    else:
+        dimension = 0
+
     playerdir = os.path.join(worldpath, "playerdata")
     useUUIDs = True
     if not os.path.isdir(playerdir):
@@ -151,41 +201,40 @@ def handlePlayers(rset, render, worldpath):
         isSinglePlayer = True
 
     rset._pois['Players'] = []
+
     for playerfile in playerfiles:
         try:
-            path = os.path.join(playerdir, playerfile)
-            data = nbt.load(path)[1]
+            data = PlayerDict(nbt.load(os.path.join(playerdir, playerfile))[1])
+            data.use_uuid = useUUIDs
             if isSinglePlayer:
                 data = data['Data']['Player']
         except IOError:
             logging.warning("Skipping bad player dat file %r", playerfile)
             continue
         playername = playerfile.split(".")[0]
-        if useUUIDs:
-            try:
-                profile = json.loads(urllib2.urlopen(UUID_LOOKUP_URL + playername.replace('-','')).read())
-                if 'name' in profile:
-                    playername = profile['name']
-            except (ValueError, urllib2.URLError):
-                logging.warning("Unable to get player name for UUID %s", playername)
+
         if isSinglePlayer:
             playername = 'Player'
+
+        data._name = playername
+
         if data['Dimension'] == dimension:
             # Position at last logout
             data['id'] = "Player"
-            data['EntityId'] = playername
             data['x'] = int(data['Pos'][0])
             data['y'] = int(data['Pos'][1])
             data['z'] = int(data['Pos'][2])
-            data['mtime'] = os.path.getmtime(path)
+            # Time at last logout, calculated from last time the player's file was modified
+            data['time'] = time.localtime(os.path.getmtime(os.path.join(playerdir, playerfile)))
             rset._pois['Players'].append(data)
         if "SpawnX" in data and dimension == 0:
             # Spawn position (bed or main spawn)
-            spawn = {"id": "PlayerSpawn",
-                     "EntityId": playername,
-                     "x": data['SpawnX'],
-                     "y": data['SpawnY'],
-                     "z": data['SpawnZ']}
+            spawn = PlayerDict()
+            spawn._name = playername
+            spawn["id"] = "PlayerSpawn"
+            spawn["x"] = data['SpawnX']
+            spawn["y"] = data['SpawnY']
+            spawn["z"] = data['SpawnZ']
             rset._pois['Players'].append(spawn)
 
 def handleManual(rset, manualpois):
@@ -237,6 +286,8 @@ def main():
     markersets = set()
     markers = dict()
 
+    PlayerDict.load_cache(destdir)
+
     for rname, render in config['renders'].iteritems():
         try:
             worldpath = config['worlds'][render['world']]
@@ -276,7 +327,7 @@ def main():
         if not options.skipscan:
             handleEntities(rset, os.path.join(destdir, rname), render, rname, config)
 
-        handlePlayers(rset, render, worldpath)
+        handlePlayers(rset, render, worldpath, destdir)
         handleManual(rset, render['manualpois'])
 
     logging.info("Done handling POIs")
@@ -386,6 +437,8 @@ def main():
                     d.update({"createInfoWindow": poi['createInfoWindow']})
                 markerSetDict[name]['raw'].append(d)
     #print markerSetDict
+
+    PlayerDict.save_cache(destdir)
 
     with open(os.path.join(destdir, "markersDB.js"), "w") as output:
         output.write("var markersDB=")
