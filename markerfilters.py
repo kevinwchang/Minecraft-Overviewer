@@ -30,4 +30,4 @@ def normalsign(poi):
 def playericons(poi):
 	if poi['id'] == 'Player' and isrealplayer(poi):
 		poi['icon'] = "http://overviewer.org/avatar/%s" % poi['EntityId']
-		return 'Last known location for {0}\n{1}'.format(poi['EntityId'], time.strftime('%A, %B %d, %Y\n%H:%M:%S %Z', time.localtime(poi['mtime'])))
+		return 'Last known location for {0}\n{1}'.format(poi['EntityId'], time.strftime('%A, %B %d, %Y\n%H:%M:%S %Z', poi['time']))
