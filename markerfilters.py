@@ -4,7 +4,7 @@ import time
 # helpers
 
 def fulltext(poi):
-	return '\n'.join([poi['Text1'], poi['Text2'], poi['Text3'], poi['Text4']])
+	return '\n'.join([poi['Text1'][1:-1], poi['Text2'][1:-1], poi['Text3'][1:-1], poi['Text4'][1:-1]]).decode('unicode-escape') 
 
 label_re = re.compile('^\s*#')
 
