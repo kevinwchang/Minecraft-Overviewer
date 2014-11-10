@@ -1,3 +1,4 @@
+import os
 import markerfilters
 
 worlds['world'] = 'world'
@@ -16,6 +17,8 @@ filters = [
 	dict(name = 'Labels',  filterFunction = markerfilters.labelsign, checked = True),
 	dict(name = 'Signs',   filterFunction = markerfilters.normalsign),
 	dict(name = 'Players', filterFunction = markerfilters.playericons)]
+
+texturepath='~/.minecraft/versions/' + os.getenv('VERSION') + '/' + os.getenv('VERSION') + '.jar'
 
 renders['day'] = {
 	'world': 'world',
@@ -47,12 +50,12 @@ renders['night'] = {
 #	'poititle': 'Markers'
 #}
 
-#renders['nether'] = {
-#	'world': 'world',
-#	'title': 'Nether',
-#	'rendermode': nether_ambient_smooth_lighting,
-#	'dimension': 'nether',
-#	'northdirection': 'upper-right',
-#	'markers': filters,
-#	'poititle': 'Markers'
-#}
+renders['nether'] = {
+	'world': 'world',
+	'title': 'Nether',
+	'rendermode': nether_ambient_smooth_lighting,
+	'dimension': 'nether',
+	'northdirection': 'upper-right',
+	'markers': filters,
+	'poititle': 'Markers'
+}

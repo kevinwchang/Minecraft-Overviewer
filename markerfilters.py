@@ -4,28 +4,35 @@ import time
 # helpers
 
 def fulltext(poi):
-	return '\n'.join([poi['Text1'][1:-1], poi['Text2'][1:-1], poi['Text3'][1:-1], poi['Text4'][1:-1]]).decode('unicode-escape') 
+	raw = '\n'.join([poi['Text1'][1:-1], poi['Text2'][1:-1], poi['Text3'][1:-1], poi['Text4'][1:-1]])
+	decoded = raw.replace(u'\uf700', '').replace(u'\uf701', '').decode('unicode-escape')
+	return raw, decoded
 
 label_re = re.compile('^\s*#')
 
-def islabelsign(poi):
-	return label_re.search(fulltext(poi)) is not None
+def islabelsign(text):
+	return label_re.search(text) is not None
 
-bot_re = re.compile('bot$', re.I)
-cam_re = re.compile('cam$', re.I)
+fakeplayer_re = re.compile('(bot|cam)$', re.I)
 
 def isrealplayer(poi):
-	return bot_re.search(poi['EntityId']) is None and cam_re.search(poi['EntityId']) is None
+	return fakeplayer_re.search(poi['EntityId']) is None
 
 # filters
 
 def labelsign(poi):
-	if poi['id'] == 'Sign' and islabelsign(poi):
-		return fulltext(poi)
+	if poi['id'] == 'Sign':
+		raw, decoded = fulltext(poi)
+		if islabelsign(decoded):
+			print 'Label: ' + decoded.replace('\n', ' ') + ' (raw: ' + repr(raw) + ')'
+			return decoded
 
 def normalsign(poi):
-	if poi['id'] == 'Sign' and not islabelsign(poi) and not fulltext(poi).strip() == '':
-		return fulltext(poi)
+	if poi['id'] == 'Sign':
+		raw, decoded = fulltext(poi)
+		if not islabelsign(decoded) and not decoded.strip() == '':
+			print 'Sign: ' + decoded.replace('\n', ' ') + ' (raw: ' + repr(raw) + ')'
+			return decoded
 
 def playericons(poi):
 	if poi['id'] == 'Player' and isrealplayer(poi):
