@@ -114,6 +114,8 @@ def main():
             help="Runs the genPOI script")
     exegroup.add_option("--skip-scan", dest="skipscan", action="store_true",
             help="When running GenPOI, don't scan for entities")
+    exegroup.add_option("--skip-players", dest="skipplayers", action="store_true",
+            help="When running GenPOI, don't get player data")
 
     parser.add_option_group(exegroup)
 
@@ -486,8 +488,8 @@ dir but you forgot to put quotes around the directory, since it contains spaces.
             logging.error("Sorry, I can't find anything to render!  Are you sure there are .mca files in the world directory?")
             return 1
         if rset == None: # indicates no such dimension was found:
-            logging.error("Sorry, you requested dimension '%s' for %s, but I couldn't find it", render['dimension'][0], render_name)
-            return 1
+            logging.warn("Sorry, you requested dimension '%s' for %s, but I couldn't find it", render['dimension'][0], render_name)
+            continue
 
         #################
         # Apply any regionset transformations here
@@ -525,6 +527,12 @@ dir but you forgot to put quotes around the directory, since it contains spaces.
         for rset in rsets:
             tset = tileset.TileSet(w, rset, assetMrg, tex, tileSetOpts, tileset_dir)
             tilesets.append(tset)
+
+    # If none of the requested dimenstions exist, tilesets will be empty
+    if not tilesets:
+        logging.error("There are no tilesets to render!  There's nothing to do, so exiting.")
+        return 1
+
 
     # Do tileset preprocessing here, before we start dispatching jobs
     logging.info("Preprocessing...")

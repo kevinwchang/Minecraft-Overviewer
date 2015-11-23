@@ -220,7 +220,9 @@ General
 
 ``renders``
     This is also pre-defined as an empty dictionary. The config file is expected
-    to add at least one item to it.
+    to add at least one item to it. By default, it is an ordered dictionary; the
+    order you add entries to it will determine the default render in the output
+    map and the order the buttons appear in the map UI.
 
     Keys are strings that are used as the identifier for this render in the
     javascript, and also as the directory name for the tiles, but it's
@@ -376,6 +378,31 @@ Observers
             once for every 1% of progress.
             
             **Required**
+
+    ``RConObserver(target, password[, port][, pct_interval])``
+        This Observer will announce render progress with the server's ``say``
+        command through RCon.
+
+        * ``target=<address>``
+            Address of the target Minecraft server.
+
+            **Required**
+
+        * ``password=<rcon password>``
+            The server's rcon password.
+
+            **Required**
+
+        * ``port=<port number>``
+            Port on which the Minecraft server listens for incoming RCon connections.
+
+            **Default:** ``25575``
+
+        * ``pct_interval=<update rate, in percent>``
+            Percentage interval in which the progress should be announced, the same as
+            for ``ServerAnnounceObserver``.
+
+            **Default:** ``10``
             
             
 
@@ -1126,6 +1153,32 @@ MineralOverlay
         Example::
 
             MineralOverlay(minerals=[(64,(255,255,0)), (13,(127,0,127))])
+
+StructureOverlay
+    Color the map according to patterns of blocks. With this rail overlays
+    or overlays for other small structures can be realized. It can also be
+    a MineralOverlay with alpha support.
+
+    This Overlay colors according to a patterns that are specified as
+    multiple tuples of the form ``(relx, rely, relz, blockid)``. So
+    by specifying ``(0, -1, 0, 4)`` the block below the current one has to
+    be a cobblestone.
+
+    One color is then specified as
+    ``((relblockid1, relblockid2, ...), (r, g, b, a))`` where the
+    ``relblockid*`` are relative coordinates and the blockid as specified
+    above. The ``relblockid*`` must match all at the same time for the
+    color to apply.
+
+    Example::
+
+        StructureOverlay(structures=[(((0, 0, 0, 66), (0, -1, 0, 4)), (255, 0, 0, 255)),
+                                     (((0, 0, 0, 27), (0, -1, 0, 4)), (0, 255, 0, 255))])
+
+    In this example all rails(66) on top of cobblestone are rendered in
+    pure red. And all powerrails(27) are rendered in green.
+
+    If ``structures`` is not provided, a default rail coloring is used.
 
 BiomeOverlay
     Color the map according to the biome at that point. Either use on
