@@ -1,7 +1,13 @@
 #!/bin/bash
+ps aux|grep "python overviewer\.py"|grep -v grep > /dev/null
+if [ $? -eq 0 ]; then
+  echo "Overviewer already running?"
+  exit 1
+fi
+
 cd "$( dirname "$0" )"
-export VERSION=1.8
+export VERSION=1.8.8
 wget -N https://s3.amazonaws.com/Minecraft.Download/versions/$VERSION/${VERSION}.jar -P ~/.minecraft/versions/$VERSION/
 rsync -a --delete ../world .
-python overviewer.py --config config.py
+python overviewer.py --config config.py || exit 1
 python overviewer.py --config config.py --genpoi

@@ -1,5 +1,6 @@
 import os
 import markerfilters
+from optimizeimages import optipng
 
 worlds['world'] = 'world'
 
@@ -38,6 +39,17 @@ renders['night'] = {
 	'northdirection': 'upper-right',
 	'markers': filters,
 	'poititle': 'Markers'
+}
+
+renders['biomeover'] = {
+	'world': 'world',
+	'title': 'Biomes',
+	'rendermode': [ClearBase(), BiomeOverlay()],
+	'dimension': 'overworld',
+	'northdirection': 'upper-right',
+	'overlay': ['day', 'night'],
+	'imgformat': 'png',
+	'optimizeimg': [optipng()]
 }
 
 #renders['end'] = {

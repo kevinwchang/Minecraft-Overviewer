@@ -157,6 +157,7 @@ div.searchResultItem img {
 } 
 
 div.mapLabel {
+    z-index: 1; 
     text-align: center;
     font-family: 'label-font';
     font-size: 24px;

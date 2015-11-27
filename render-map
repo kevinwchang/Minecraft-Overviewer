@@ -1,6 +1,6 @@
 #!/bin/bash
 cd "$( dirname "$0" )"
-./render-map-local
+./render-map-local || exit 1
 
 keychain id_rsa
 . ~/.keychain/`uname -n`-sh
