@@ -4,7 +4,7 @@ import time
 # helpers
 
 def fulltext(poi):
-	raw = '\n'.join([poi['Text1'][1:-1], poi['Text2'][1:-1], poi['Text3'][1:-1], poi['Text4'][1:-1]])
+	raw = '\n'.join([poi['Text1'], poi['Text2'], poi['Text3'], poi['Text4']])
 	decoded = raw.replace(u'\uf700', '').replace(u'\uf701', '').decode('unicode-escape')
 	return raw, decoded
 
