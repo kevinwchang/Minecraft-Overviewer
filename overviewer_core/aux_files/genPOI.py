@@ -110,6 +110,7 @@ def parseBucketChunks((bucket, rset, filters)):
 
     i = 0
     cnt = 0
+    mcnt_prev = 0
     for b in bucket:
         try:
             data = rset.get_chunk(b[0],b[1])
@@ -130,7 +131,10 @@ def parseBucketChunks((bucket, rset, filters)):
         if i == 250:
             i = 0
             cnt = 250 + cnt
-            logging.info("Found %d markers in thread %d so far at %d chunks", sum(len(v) for v in markers.itervalues()), pid, cnt);
+            mcnt = sum(len(v) for v in markers.itervalues())
+            if mcnt > mcnt_prev:
+                logging.info("Found %d markers in thread %d so far at %d chunks", mcnt, pid, cnt);
+                mcnt_prev = mcnt
 
     return markers
 
