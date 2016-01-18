@@ -6,7 +6,7 @@ if [ $? -eq 0 ]; then
 fi
 
 cd "$( dirname "$0" )"
-export VERSION=1.8.8
+export VERSION=1.8.9
 wget -N https://s3.amazonaws.com/Minecraft.Download/versions/$VERSION/${VERSION}.jar -P ~/.minecraft/versions/$VERSION/
 rsync -aL --delete ../world .
 python overviewer.py --config config.py || exit 1
