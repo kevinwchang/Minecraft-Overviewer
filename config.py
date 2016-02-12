@@ -1,6 +1,5 @@
 import os
 import markerfilters
-from optimizeimages import optipng
 
 worlds['world'] = 'world'
 

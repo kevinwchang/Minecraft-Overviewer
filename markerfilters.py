@@ -8,7 +8,7 @@ def fulltext(poi):
   decoded = raw.replace(u'\uf700', '').replace(u'\uf701', '').decode('unicode-escape')
   return raw, decoded
 
-label_re = re.compile('^\s*#')
+label_re = re.compile('^\s*##\d')
 
 def islabelsign(text):
   return label_re.search(text) is not None
@@ -37,5 +37,6 @@ def normalsign(poi):
 def playericons(poi):
   if poi['id'] == 'Player' and isrealplayer(poi):
     print 'Player: ' + poi['EntityId']
-    poi['icon'] = "http://overviewer.org/avatar/%s" % poi['EntityId']
+    poi['icon'] = 'https://minotar.net/body/{0}/16'.format(poi['EntityId'])
+    poi['image'] = 'https://minotar.net/body/{0}/64'.format(poi['EntityId'])
     return 'Last known location for {0}\n{1}'.format(poi['EntityId'], time.strftime('%A, %B %d, %Y\n%H:%M:%S %Z', poi['time']))

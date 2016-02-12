@@ -383,6 +383,8 @@ def create_marker_from_filter_result(poi, result):
     # read some Defaults from POI
     if "icon" in poi:
         d["icon"] = poi['icon']
+    if "image" in poi:
+        d["image"] = poi['image']
     if "createInfoWindow" in poi:
         d["createInfoWindow"] = poi['createInfoWindow']
 
@@ -410,6 +412,8 @@ def create_marker_from_filter_result(poi, result):
 
             if "icon" in result:
                 d["icon"] = result['icon']
+            if "image" in result:
+                d["image"] = result['image']
             if "createInfoWindow" in result:
                 d["createInfoWindow"] = result['createInfoWindow']
     else:

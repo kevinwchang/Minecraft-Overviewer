@@ -484,8 +484,8 @@ overviewer.views.SignControlView = Backbone.View.extend({
 
                     if(dataRoot[i].displayName == 'Labels') {
                         var text = jQuery.trim(entity.text);
-                        var lMaxZoomMatch = text.match(/^\s*#+0*(\d+)/);
-                        var labelContent = text.replace(/(^\s*#+\d*\s*)|(\s*#+\s*$)/g, '').replace(/\n/g,'<br/>');
+                        var lMaxZoomMatch = text.match(/^\s*##+0*(\d+)/);
+                        var labelContent = text.replace(/^\s*##\d*\s*/g, '').replace(/\n/g,'<br/>');
                         var labelClass = 'mapLabel';
 
                         if (lMaxZoomMatch != null) {
@@ -513,6 +513,11 @@ overviewer.views.SignControlView = Backbone.View.extend({
                       } else {
                           iconURL = dataRoot[i].icon;
                       }
+                      if (entity['image']) {
+                          imageURL = entity['image'];
+                      } else {
+                          imageURL = iconURL;
+                      }
                       var marker = new google.maps.Marker({
                               'position': overviewer.util.fromWorldToLatLng(entity.x,
                                   entity.y, entity.z, overviewer.mapView.options.currentTileSet),
@@ -520,6 +525,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
                               'title':    jQuery.trim(entity.hovertext), 
                               'content':  jQuery.trim(entity.text), 
                               'icon':     iconURL,
+                              'image':    imageURL,
                               'visible':  false
                       }); 
                       if(entity['createInfoWindow'] == true) {
