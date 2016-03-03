@@ -310,7 +310,7 @@ class Textures(object):
                 if verbose: logging.info("Found %s in '%s'", filename, path)
                 return open(path, mode)
 
-        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.8-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
+        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.9-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
 
     def load_image_texture(self, filename):
         # Textures may be animated or in a different resolution than 16x16.  
@@ -1557,7 +1557,7 @@ block(blockid=42, top_image="assets/minecraft/textures/blocks/iron_block.png")
 # double slabs and slabs
 # these wooden slabs are unobtainable without cheating, they are still
 # here because lots of pre-1.3 worlds use this blocks
-@material(blockid=[43, 44, 181, 182], data=range(16), transparent=(44,182,), solid=True)
+@material(blockid=[43, 44, 181, 182, 204, 205], data=range(16), transparent=(44,182,205), solid=True)
 def slabs(self, blockid, data):
     if blockid == 44 or blockid == 182: 
         texture = data & 7
@@ -1605,8 +1605,11 @@ def slabs(self, blockid, data):
             top = side = self.load_image_texture("assets/minecraft/textures/blocks/red_sandstone_top.png");
         else:
             return None
+    elif blockid == 204 or blockid == 205: # purpur slab (single=205 double=204)
+        top = side = self.load_image_texture("assets/minecraft/textures/blocks/purpur_block.png");
+
     
-    if blockid == 43 or blockid == 181: # double slab
+    if blockid == 43 or blockid == 181 or blockid == 204: # double slab
         return self.build_block(top, side)
     
     # cut the side texture in half
@@ -1740,7 +1743,7 @@ def fire(self, blockid, data):
 block(blockid=52, top_image="assets/minecraft/textures/blocks/mob_spawner.png", transparent=True)
 
 # wooden, cobblestone, red brick, stone brick, netherbrick, sandstone, spruce, birch, jungle, quartz, and red sandstone stairs.
-@material(blockid=[53,67,108,109,114,128,134,135,136,156,163,164,180], data=range(128), transparent=True, solid=True, nospawn=True)
+@material(blockid=[53,67,108,109,114,128,134,135,136,156,163,164,180,203], data=range(128), transparent=True, solid=True, nospawn=True)
 def stairs(self, blockid, data):
     # preserve the upside-down bit
     upside_down = data & 0x4
@@ -1779,6 +1782,8 @@ def stairs(self, blockid, data):
         texture = self.load_image_texture("assets/minecraft/textures/blocks/planks_big_oak.png").copy()
     elif blockid == 180: # red sandstone stairs
         texture = self.load_image_texture("assets/minecraft/textures/blocks/red_sandstone_normal.png").copy()
+    elif blockid == 203: # purpur stairs
+        texture = self.load_image_texture("assets/minecraft/textures/blocks/purpur_block.png").copy()
 
     outside_l = texture.copy()
     outside_r = texture.copy()
@@ -2063,18 +2068,18 @@ def chests(self, blockid, data):
 def wire(self, blockid, data):
 
     if data & 0b1000000 == 64: # powered redstone wire
-        redstone_wire_t = self.load_image_texture("assets/minecraft/textures/blocks/redstone_dust_line.png")
+        redstone_wire_t = self.load_image_texture("assets/minecraft/textures/blocks/redstone_dust_line0.png").rotate(90)
         redstone_wire_t = self.tint_texture(redstone_wire_t,(255,0,0))
 
-        redstone_cross_t = self.load_image_texture("assets/minecraft/textures/blocks/redstone_dust_cross.png")
+        redstone_cross_t = self.load_image_texture("assets/minecraft/textures/blocks/redstone_dust_dot.png")
         redstone_cross_t = self.tint_texture(redstone_cross_t,(255,0,0))
 
         
     else: # unpowered redstone wire
-        redstone_wire_t = self.load_image_texture("assets/minecraft/textures/blocks/redstone_dust_line.png")
+        redstone_wire_t = self.load_image_texture("assets/minecraft/textures/blocks/redstone_dust_line0.png").rotate(90)
         redstone_wire_t = self.tint_texture(redstone_wire_t,(48,0,0))
         
-        redstone_cross_t = self.load_image_texture("assets/minecraft/textures/blocks/redstone_dust_cross.png")
+        redstone_cross_t = self.load_image_texture("assets/minecraft/textures/blocks/redstone_dust_dot.png")
         redstone_cross_t = self.tint_texture(redstone_cross_t,(48,0,0))
 
     # generate an image per redstone direction
@@ -2101,26 +2106,24 @@ def wire(self, blockid, data):
     # generate the bottom texture
     if data & 0b111111 == 0:
         bottom = redstone_cross_t.copy()
-    
-    elif data & 0b1111 == 10: #= 0b1010 redstone wire in the x direction
-        bottom = redstone_wire_t.copy()
-        
-    elif data & 0b1111 == 5: #= 0b0101 redstone wire in the y direction
-        bottom = redstone_wire_t.copy().rotate(90)
-    
+
+    # see iterate.c for where these masks come from
+    has_x = (data & 0b1010) > 0
+    has_z = (data & 0b0101) > 0
+    if has_x and has_z:
+        bottom = redstone_cross_t.copy()
+        if has_x:
+            alpha_over(bottom, redstone_wire_t.copy())
+        if has_z:
+            alpha_over(bottom, redstone_wire_t.copy().rotate(90))
+
     else:
-        bottom = Image.new("RGBA", (16,16), self.bgcolor)
-        if (data & 0b0001) == 1:
-            alpha_over(bottom,branch_top_left)
-            
-        if (data & 0b1000) == 8:
-            alpha_over(bottom,branch_top_right)
-            
-        if (data & 0b0010) == 2:
-            alpha_over(bottom,branch_bottom_left)
-            
-        if (data & 0b0100) == 4:
-            alpha_over(bottom,branch_bottom_right)
+        if has_x:
+            bottom = redstone_wire_t.copy()
+        elif has_z:
+            bottom = redstone_wire_t.copy().rotate(90)
+        elif data & 0b1111 == 0: 
+            bottom = redstone_cross_t.copy()
 
     # check for going up redstone wire
     if data & 0b100000 == 32:
@@ -4000,7 +4003,12 @@ def cocoa_plant(self, blockid, data):
     return img
 
 # command block
-block(blockid=137, top_image="assets/minecraft/textures/blocks/command_block.png")
+@material(blockid=137, solid=True, nodata=True)
+def command_block(self, blockid, data):
+    front = self.load_image_texture("assets/minecraft/textures/blocks/command_block_front.png")
+    side = self.load_image_texture("assets/minecraft/textures/blocks/command_block_side.png")
+    back = self.load_image_texture("assets/minecraft/textures/blocks/command_block_back.png")
+    return self.build_full_block(side, side, back, front, side)
 
 # beacon block
 # at the moment of writing this, it seems the beacon block doens't use
@@ -4405,3 +4413,12 @@ def flower(self, blockid, data):
         alpha_over(img, bloom_tex.resize((14, 11), Image.ANTIALIAS), (5,5))
 
     return img
+
+# purpur block
+block(blockid=201, top_image="assets/minecraft/textures/blocks/purpur_block.png")
+
+# purpur pilar
+block(blockid=202, top_image="assets/minecraft/textures/blocks/purpur_pillar_top.png", side_image="assets/minecraft/textures/blocks/purpur_pillar.png")
+
+# end brick
+block(blockid=206, top_image="assets/minecraft/textures/blocks/end_bricks.png")
