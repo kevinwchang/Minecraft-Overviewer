@@ -706,6 +706,15 @@ class Textures(object):
             top = self.transform_image_top(top)
             alpha_over(img, top, (0, increment), top)
 
+        # Manually touch up 6 pixels that leave a gap because of how the
+        # shearing works out. This makes the blocks perfectly tessellate-able
+        for x,y in [(13,23), (17,21), (21,19)]:
+            # Copy a pixel to x,y from x-1,y
+            img.putpixel((x,y), img.getpixel((x-1,y)))
+        for x,y in [(3,4), (7,2), (11,0)]:
+            # Copy a pixel to x,y from x+1,y
+            img.putpixel((x,y), img.getpixel((x+1,y)))
+
         return img
 
     def build_sprite(self, side):
@@ -2156,9 +2165,9 @@ def crafting_table(self, blockid, data):
     img = self.build_full_block(top, None, None, side3, side4, None)
     return img
 
-# crops
+# crops with 8 data values (like wheat)
 @material(blockid=59, data=range(8), transparent=True, nospawn=True)
-def crops(self, blockid, data):
+def crops8(self, blockid, data):
     raw_crop = self.load_image_texture("assets/minecraft/textures/blocks/wheat_stage_%d.png" % data)
     crop1 = self.transform_image_top(raw_crop)
     crop2 = self.transform_image_side(raw_crop)
@@ -3787,8 +3796,8 @@ def cauldron(self, blockid, data):
 
     return img
 
-# end portal
-@material(blockid=119, transparent=True, nodata=True)
+# end portal and end_gateway
+@material(blockid=[119,209], transparent=True, nodata=True)
 def end_portal(self, blockid, data):
     img = Image.new("RGBA", (24,24), self.bgcolor)
     # generate a black texure with white, blue and grey dots resembling stars
@@ -3798,7 +3807,9 @@ def end_portal(self, blockid, data):
             x = randint(0,15)
             y = randint(0,15)
             t.putpixel((x,y),color)
-
+    if blockid == 209: # end_gateway
+        return  self.build_block(t, t)
+        
     t = self.transform_image_top(t)
     alpha_over(img, t, (0,0), t)
 
@@ -4015,11 +4026,20 @@ def cocoa_plant(self, blockid, data):
     return img
 
 # command block
-@material(blockid=137, solid=True, nodata=True)
+@material(blockid=[137,210,211], solid=True, nodata=True)
 def command_block(self, blockid, data):
-    front = self.load_image_texture("assets/minecraft/textures/blocks/command_block_front.png")
-    side = self.load_image_texture("assets/minecraft/textures/blocks/command_block_side.png")
-    back = self.load_image_texture("assets/minecraft/textures/blocks/command_block_back.png")
+    if blockid == 210:
+        front = self.load_image_texture("assets/minecraft/textures/blocks/repeating_command_block_front.png")
+        side = self.load_image_texture("assets/minecraft/textures/blocks/repeating_command_block_side.png")
+        back = self.load_image_texture("assets/minecraft/textures/blocks/repeating_command_block_back.png")
+    elif blockid == 211:
+        front = self.load_image_texture("assets/minecraft/textures/blocks/chain_command_block_front.png")
+        side = self.load_image_texture("assets/minecraft/textures/blocks/chain_command_block_side.png")
+        back = self.load_image_texture("assets/minecraft/textures/blocks/chain_command_block_back.png")
+    else:
+        front = self.load_image_texture("assets/minecraft/textures/blocks/command_block_front.png")
+        side = self.load_image_texture("assets/minecraft/textures/blocks/command_block_side.png")
+        back = self.load_image_texture("assets/minecraft/textures/blocks/command_block_back.png")
     return self.build_full_block(side, side, back, front, side)
 
 # beacon block
@@ -4174,17 +4194,22 @@ def cobblestone_wall(self, blockid, data):
     
     return img
 
-# carrots and potatoes
-@material(blockid=[141,142], data=range(8), transparent=True, nospawn=True)
-def crops(self, blockid, data):
-    if data != 7: # when growing they look the same
-        # data = 7 -> fully grown, everything else is growing
-        # this seems to work, but still not sure
-        raw_crop = self.load_image_texture("assets/minecraft/textures/blocks/potatoes_stage_%d.png" % (data % 3))
-    elif blockid == 141: # carrots
-        raw_crop = self.load_image_texture("assets/minecraft/textures/blocks/carrots_stage_3.png")
+# carrots, potatoes
+@material(blockid=[141,142,207], data=range(8), transparent=True, nospawn=True)
+def crops4(self, blockid, data):
+    # carrots and potatoes have 8 data, but only 4 visual stages
+    stage = {0:0,
+             1:0,
+             2:1,
+             3:1,
+             4:2,
+             5:2,
+             6:2,
+             7:3}[data]
+    if blockid == 141: # carrots
+        raw_crop = self.load_image_texture("assets/minecraft/textures/blocks/carrots_stage_%d.png" % stage)
     else: # potatoes
-        raw_crop = self.load_image_texture("assets/minecraft/textures/blocks/potatoes_stage_3.png")
+        raw_crop = self.load_image_texture("assets/minecraft/textures/blocks/potatoes_stage_%d.png" % stage)
     crop1 = self.transform_image_top(raw_crop)
     crop2 = self.transform_image_side(raw_crop)
     crop3 = crop2.transpose(Image.FLIP_LEFT_RIGHT)
@@ -4430,7 +4455,50 @@ def flower(self, blockid, data):
 block(blockid=201, top_image="assets/minecraft/textures/blocks/purpur_block.png")
 
 # purpur pilar
-block(blockid=202, top_image="assets/minecraft/textures/blocks/purpur_pillar_top.png", side_image="assets/minecraft/textures/blocks/purpur_pillar.png")
+@material(blockid=202, data=range(12) , solid=True)
+def purpur_pillar(self, blockid, data):
+    pillar_orientation = data & 12
+    top=self.load_image_texture("assets/minecraft/textures/blocks/purpur_pillar_top.png")
+    side=self.load_image_texture("assets/minecraft/textures/blocks/purpur_pillar.png")
+    if pillar_orientation == 0: # east-west orientation
+        return self.build_block(top, side)
+    elif pillar_orientation == 4: # east-west orientation
+        return self.build_full_block(side.rotate(90), None, None, top, side.rotate(90))
+    elif pillar_orientation == 8: # north-south orientation
+        return self.build_full_block(side, None, None, side.rotate(270), top)
 
 # end brick
 block(blockid=206, top_image="assets/minecraft/textures/blocks/end_bricks.png")
+
+# frosted ice
+@material(blockid=212, data=range(4), solid=True)
+def frosted_ice(self, blockid, data):
+    img = self.load_image_texture("assets/minecraft/textures/blocks/frosted_ice_%d.png" % data)
+    return self.build_block(img, img)
+
+# structure block
+@material(blockid=255, data=range(4), solid=True)
+def structure_block(self, blockid, data):
+    if data == 0:
+        img = self.load_image_texture("assets/minecraft/textures/blocks/structure_block_save.png")
+    elif data == 1:
+        img = self.load_image_texture("assets/minecraft/textures/blocks/structure_block_load.png")
+    elif data == 2:
+        img = self.load_image_texture("assets/minecraft/textures/blocks/structure_block_corner.png")
+    elif data == 3:
+        img = self.load_image_texture("assets/minecraft/textures/blocks/structure_block_data.png")
+    return self.build_block(img, img)
+
+# beetroots
+@material(blockid=[207], data=range(4), transparent=True, nospawn=True)
+def crops(self, blockid, data):
+    raw_crop = self.load_image_texture("assets/minecraft/textures/blocks/beetroots_stage_%d.png" % data)
+    crop1 = self.transform_image_top(raw_crop)
+    crop2 = self.transform_image_side(raw_crop)
+    crop3 = crop2.transpose(Image.FLIP_LEFT_RIGHT)
+
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+    alpha_over(img, crop1, (0,12), crop1)
+    alpha_over(img, crop2, (6,3), crop2)
+    alpha_over(img, crop3, (6,3), crop3)
+    return img
