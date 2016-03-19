@@ -86,7 +86,7 @@ body {
     border-radius: 2px 2px;
     box-shadow: rgba(0, 0, 0, 0.347656) 2px 2px 3px;
     
-    display: none;
+    /* display: none; */
 }
 
 .customControl > div.button {

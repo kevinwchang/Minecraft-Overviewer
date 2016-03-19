@@ -294,6 +294,7 @@ overviewer.views.OverlayControlView = Backbone.View.extend({
         
         var controlBorder = document.createElement('DIV');
         $(controlBorder).addClass('top');
+        $(controlBorder).addClass('top-active');
         this.el.appendChild(controlBorder);
         controlBorder.appendChild(controlText);
         
@@ -457,6 +458,7 @@ overviewer.views.SignControlView = Backbone.View.extend({
 
         var controlBorder = document.createElement('DIV');
         $(controlBorder).addClass('top');
+        $(controlBorder).addClass('top-active');
         this.el.appendChild(controlBorder);
         controlBorder.appendChild(controlText);
 
