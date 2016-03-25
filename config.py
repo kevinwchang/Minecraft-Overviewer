@@ -15,9 +15,10 @@ end_ambient_smooth_lighting = [Base(), EdgeLines(), SmoothLighting(strength=0.8)
 nether_ambient_smooth_lighting = [Base(), EdgeLines(), Nether(), SmoothLighting(strength=0.8)]
 
 filters = [
-  dict(name = 'Labels',  filterFunction = markerfilters.labelsign, checked = True),
-  dict(name = 'Signs',   filterFunction = markerfilters.normalsign),
-  dict(name = 'Players', filterFunction = markerfilters.playericons)]
+  dict(name = 'Labels',     filterFunction = markerfilters.label_sign_filter, checked = True),
+  dict(name = 'Signs',      filterFunction = markerfilters.normal_sign_filter),
+  dict(name = 'Players',    filterFunction = markerfilters.player_filter),
+  dict(name = 'Named mobs', filterFunction = markerfilters.named_mob_filter)]
 
 texturepath='~/.minecraft/versions/' + os.getenv('VERSION') + '/' + os.getenv('VERSION') + '.jar'
 
