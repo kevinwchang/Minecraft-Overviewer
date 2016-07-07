@@ -110,10 +110,10 @@ The first render can take a while, depending on the size of your world.
 Options
 -------
 
-The following three options change the way The Overviewer determines which tiles
-to update, and are intended to be things you only have to use in special
-situations. You should not normally have to specify these options; the default
-is typically correct.
+The following options change the way The Overviewer generates or updates the
+map, and are intended to be things you only have to use in special situations.
+You should not normally have to specify these options; the default is
+typically correct.
 
 .. cmdoption:: --no-tile-checks
 
@@ -271,13 +271,13 @@ If you want or need to provide your own textures, you have several options:
 
   ::
 
-    VERSION=1.8
+    VERSION=1.10
     wget https://s3.amazonaws.com/Minecraft.Download/versions/${VERSION}/${VERSION}.jar -P ~/.minecraft/versions/${VERSION}/
 
   If that's too confusing for you, then just take this single line and paste it into
   a terminal to get 1.8 textures::
 
-    wget https://s3.amazonaws.com/Minecraft.Download/versions/1.8/1.8.jar -P ~/.minecraft/versions/1.8/
+    wget https://s3.amazonaws.com/Minecraft.Download/versions/1.10/1.10.jar -P ~/.minecraft/versions/1.10/
 
 * You can also just run the launcher to install the client.
 

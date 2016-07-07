@@ -310,7 +310,7 @@ class Textures(object):
                 if verbose: logging.info("Found %s in '%s'", filename, path)
                 return open(path, mode)
 
-        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.9-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
+        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.10-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
 
     def load_image_texture(self, filename):
         # Textures may be animated or in a different resolution than 16x16.  
@@ -607,6 +607,57 @@ class Textures(object):
         for x,y in [(3,4), (7,2), (11,0)]:
             # Copy a pixel to x,y from x+1,y
             img.putpixel((x,y), img.getpixel((x+1,y)))
+
+        return img
+
+    def build_slab_block(self, top, side, upper):
+        """From a top texture and a side texture, build a slab block image.
+        top and side should be 16x16 image objects. Returns a 24x24 image
+
+        """
+        # cut the side texture in half
+        mask = side.crop((0,8,16,16))
+        side = Image.new(side.mode, side.size, self.bgcolor)
+        alpha_over(side, mask,(0,0,16,8), mask)
+
+        # plain slab
+        top = self.transform_image_top(top)
+        side = self.transform_image_side(side)
+        otherside = side.transpose(Image.FLIP_LEFT_RIGHT)
+
+        sidealpha = side.split()[3]
+        side = ImageEnhance.Brightness(side).enhance(0.9)
+        side.putalpha(sidealpha)
+        othersidealpha = otherside.split()[3]
+        otherside = ImageEnhance.Brightness(otherside).enhance(0.8)
+        otherside.putalpha(othersidealpha)
+
+        # upside down slab
+        delta = 0
+        if upper:
+            delta = 6
+
+        img = Image.new("RGBA", (24,24), self.bgcolor)
+        alpha_over(img, side, (0,12 - delta), side)
+        alpha_over(img, otherside, (12,12 - delta), otherside)
+        alpha_over(img, top, (0,6 - delta), top)
+
+        # Manually touch up 6 pixels that leave a gap because of how the
+        # shearing works out. This makes the blocks perfectly tessellate-able
+        if upper:
+            for x,y in [(3,4), (7,2), (11,0)]:
+                # Copy a pixel to x,y from x+1,y
+                img.putpixel((x,y), img.getpixel((x+1,y)))
+            for x,y in [(13,17), (17,15), (21,13)]:
+                # Copy a pixel to x,y from x-1,y
+                img.putpixel((x,y), img.getpixel((x-1,y)))
+        else:
+            for x,y in [(3,10), (7,8), (11,6)]:
+                # Copy a pixel to x,y from x+1,y
+                img.putpixel((x,y), img.getpixel((x+1,y)))
+            for x,y in [(13,23), (17,21), (21,19)]:
+                # Copy a pixel to x,y from x-1,y
+                img.putpixel((x,y), img.getpixel((x-1,y)))
 
         return img
 
@@ -1621,34 +1672,7 @@ def slabs(self, blockid, data):
     if blockid == 43 or blockid == 181 or blockid == 204: # double slab
         return self.build_block(top, side)
     
-    # cut the side texture in half
-    mask = side.crop((0,8,16,16))
-    side = Image.new(side.mode, side.size, self.bgcolor)
-    alpha_over(side, mask,(0,0,16,8), mask)
-    
-    # plain slab
-    top = self.transform_image_top(top)
-    side = self.transform_image_side(side)
-    otherside = side.transpose(Image.FLIP_LEFT_RIGHT)
-    
-    sidealpha = side.split()[3]
-    side = ImageEnhance.Brightness(side).enhance(0.9)
-    side.putalpha(sidealpha)
-    othersidealpha = otherside.split()[3]
-    otherside = ImageEnhance.Brightness(otherside).enhance(0.8)
-    otherside.putalpha(othersidealpha)
-    
-    # upside down slab
-    delta = 0
-    if data & 8 == 8:
-        delta = 6
-    
-    img = Image.new("RGBA", (24,24), self.bgcolor)
-    alpha_over(img, side, (0,12 - delta), side)
-    alpha_over(img, otherside, (12,12 - delta), otherside)
-    alpha_over(img, top, (0,6 - delta), top)
-    
-    return img
+    return self.build_slab_block(top, side, data & 8 == 8);
 
 # brick block
 block(blockid=45, top_image="assets/minecraft/textures/blocks/brick.png")
@@ -3909,34 +3933,7 @@ def wooden_slabs(self, blockid, data):
     if blockid == 125: # double slab
         return self.build_block(top, side)
     
-    # cut the side texture in half
-    mask = side.crop((0,8,16,16))
-    side = Image.new(side.mode, side.size, self.bgcolor)
-    alpha_over(side, mask,(0,0,16,8), mask)
-    
-    # plain slab
-    top = self.transform_image_top(top)
-    side = self.transform_image_side(side)
-    otherside = side.transpose(Image.FLIP_LEFT_RIGHT)
-    
-    sidealpha = side.split()[3]
-    side = ImageEnhance.Brightness(side).enhance(0.9)
-    side.putalpha(sidealpha)
-    othersidealpha = otherside.split()[3]
-    otherside = ImageEnhance.Brightness(otherside).enhance(0.8)
-    otherside.putalpha(othersidealpha)
-    
-    # upside down slab
-    delta = 0
-    if data & 8 == 8:
-        delta = 6
-    
-    img = Image.new("RGBA", (24,24), self.bgcolor)
-    alpha_over(img, side, (0,12 - delta), side)
-    alpha_over(img, otherside, (12,12 - delta), otherside)
-    alpha_over(img, top, (0,6 - delta), top)
-    
-    return img
+    return self.build_slab_block(top, side, data & 8 == 8);
 
 # emerald ore
 block(blockid=129, top_image="assets/minecraft/textures/blocks/emerald_ore.png")
@@ -4065,12 +4062,15 @@ def beacon(self, blockid, data):
     
     return img
 
-# cobblestone and mossy cobblestone walls
+# cobblestone and mossy cobblestone walls, chorus plants
 # one additional bit of data value added for mossy and cobblestone
-@material(blockid=139, data=range(32), transparent=True, nospawn=True)
+@material(blockid=[139, 199], data=range(32), transparent=True, nospawn=True)
 def cobblestone_wall(self, blockid, data):
+    # chorus plants
+    if blockid == 199:
+        t = self.load_image_texture("assets/minecraft/textures/blocks/chorus_plant.png").copy()
     # no rotation, uses pseudo data
-    if data & 0b10000 == 0:
+    elif data & 0b10000 == 0:
         # cobblestone
         t = self.load_image_texture("assets/minecraft/textures/blocks/cobblestone.png").copy()
     else:
@@ -4451,6 +4451,17 @@ def flower(self, blockid, data):
 
     return img
 
+# chorus flower
+@material(blockid=200, data=range(6), solid=True)
+def chorus_flower(self, blockid, data):
+    # aged 5, dead
+    if data == 5:
+        texture = self.load_image_texture("assets/minecraft/textures/blocks/chorus_flower_dead.png")
+    else:
+        texture = self.load_image_texture("assets/minecraft/textures/blocks/chorus_flower.png")
+
+    return self.build_block(texture,texture)
+
 # purpur block
 block(blockid=201, top_image="assets/minecraft/textures/blocks/purpur_block.png")
 
@@ -4465,6 +4476,7 @@ def purpur_pillar(self, blockid, data):
     elif pillar_orientation == 4: # east-west orientation
         return self.build_full_block(side.rotate(90), None, None, top, side.rotate(90))
     elif pillar_orientation == 8: # north-south orientation
+
         return self.build_full_block(side, None, None, side.rotate(270), top)
 
 # end brick
@@ -4475,6 +4487,37 @@ block(blockid=206, top_image="assets/minecraft/textures/blocks/end_bricks.png")
 def frosted_ice(self, blockid, data):
     img = self.load_image_texture("assets/minecraft/textures/blocks/frosted_ice_%d.png" % data)
     return self.build_block(img, img)
+
+# magma block
+block(blockid=213, top_image="assets/minecraft/textures/blocks/magma.png")
+
+# nether wart block
+block(blockid=214, top_image="assets/minecraft/textures/blocks/nether_wart_block.png")
+
+# red nether brick
+block(blockid=215, top_image="assets/minecraft/textures/blocks/red_nether_brick.png")
+
+@material(blockid=216, data=range(12), solid=True)
+def boneblock(self, blockid, data):
+    # extract orientation
+    boneblock_orientation = data & 12
+    if self.rotation == 1:
+        if boneblock_orientation == 4: boneblock_orientation = 8
+        elif boneblock_orientation == 8: boneblock_orientation = 4
+    elif self.rotation == 3:
+        if boneblock_orientation == 4: boneblock_orientation = 8
+        elif boneblock_orientation == 8: boneblock_orientation = 4
+
+    top = self.load_image_texture("assets/minecraft/textures/blocks/bone_block_top.png")
+    side = self.load_image_texture("assets/minecraft/textures/blocks/bone_block_side.png")
+
+    # choose orientation and paste textures
+    if boneblock_orientation == 0:
+        return self.build_block(top, side)
+    elif boneblock_orientation == 4: # east-west orientation
+        return self.build_full_block(side.rotate(90), None, None, top, side.rotate(90))
+    elif boneblock_orientation == 8: # north-south orientation
+        return self.build_full_block(side, None, None, side.rotate(270), top)
 
 # structure block
 @material(blockid=255, data=range(4), solid=True)
