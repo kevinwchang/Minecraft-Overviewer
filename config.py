@@ -4,12 +4,12 @@ from optimizeimages import optipng
 
 worlds['world'] = 'world'
 
-outputdir = '/var/www/minecraft/map'
-base = 'http://tiles.iprefermuffins.com:8042/minecraft/map/'
+outputdir = 'output/map'
+base = 'http://tiles.iprefermuffins.com:8080/map/'
 
 imgformat = 'jpg'
 imgquality = 50
-processes = 3
+processes = 7
 
 end_ambient_smooth_lighting = [Base(), EdgeLines(), SmoothLighting(strength=0.8)]
 nether_ambient_smooth_lighting = [Base(), EdgeLines(), Nether(), SmoothLighting(strength=0.8)]
