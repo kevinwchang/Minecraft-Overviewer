@@ -41,14 +41,14 @@ def mob_type(poi):
 ### filters ###
 
 def label_sign_filter(poi):
-  if poi['id'] == 'Sign':
+  if poi['id'] == 'minecraft:sign':
     raw, decoded = full_text(poi)
     if is_label_sign(decoded):
       print 'Label: ' + decoded.replace('\n', ' ') + ' (raw: ' + repr(raw) + ')'
       return decoded
 
 def normal_sign_filter(poi):
-  if poi['id'] == 'Sign':
+  if poi['id'] == 'minecraft:sign':
     raw, decoded = full_text(poi)
     if not is_label_sign(decoded) and not decoded.strip() == '':
       print 'Sign: ' + decoded.replace('\n', ' ') + ' (raw: ' + repr(raw) + ')'
