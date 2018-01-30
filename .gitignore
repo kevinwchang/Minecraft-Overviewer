@@ -18,6 +18,7 @@ settings*.py
 # header files that may be copied over, if missing
 ImPlatform.h
 Imaging.h
+ImagingUtils.h
 
 # various forms of compiled c_overviewer extensions
 overviewer_core/c_overviewer.so
