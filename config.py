@@ -42,6 +42,17 @@ renders['night'] = {
   'poititle': 'Markers'
 }
 
+renders['spawnover'] = {
+  'world': 'world',
+  'title': 'Spawn',
+  'rendermode': [ClearBase(), SpawnOverlay()],
+  'dimension': 'overworld',
+  'northdirection': 'upper-right',
+  'overlay': ['day', 'night'],
+  'imgformat': 'png',
+  'optimizeimg': [optipng()]
+}
+
 renders['biomeover'] = {
   'world': 'world',
   'title': 'Biomes',
