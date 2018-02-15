@@ -246,7 +246,7 @@ class ANSIColorFormatter(HighlightingFormatter):
         elif record.levelname in HIGHLIGHT:
             # Colorize the entire line
             line = logging.Formatter.format(self, record)
-            line = COLOR_SEQ % (40 + HIGHLIGHT[record.levelname]) + line + \
+            line = COLOR_SEQ % (30 + HIGHLIGHT[record.levelname]) + line + \
                     RESET_SEQ
             return line
 
