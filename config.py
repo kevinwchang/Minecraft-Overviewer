@@ -11,7 +11,7 @@ imgformat = 'jpg'
 imgquality = 50
 processes = 7
 
-end_ambient_smooth_lighting = [Base(), EdgeLines(), SmoothLighting(strength=0.8)]
+end_ambient_smooth_lighting = [Base(), EdgeLines(), SmoothLighting(strength=0.5)]
 nether_ambient_smooth_lighting = [Base(), EdgeLines(), Nether(), SmoothLighting(strength=0.8)]
 
 filters = [
